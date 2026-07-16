@@ -1,67 +1,54 @@
-export type ApiDateDto = `${number}-${number}-${number}`
-export type ApiTimeDto = `${number}:${number}`
-export type ApiAppointmentStatusDto =
+export type ApiDate = `${number}-${number}-${number}`
+export type ApiTime = `${number}:${number}`
+
+export type AppointmentStatus =
   'SCHEDULED' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
 
-export type ApiServiceDto = {
+export type Service = {
   id: string
   name: string
   description: string
   duration_minutes: number
 }
 
-export type ApiServicesResponseDto = {
-  data: ApiServiceDto[]
-}
-
-export type ApiAvailabilitySlotDto = {
-  start: ApiTimeDto
-  end: ApiTimeDto
+export type AvailabilitySlot = {
+  start: ApiTime
+  end: ApiTime
   available: boolean
 }
 
-export type ApiAvailabilityDataDto = {
+export type Availability = {
   service_id: string
-  date: ApiDateDto
+  date: ApiDate
   timezone: string
-  slots: ApiAvailabilitySlotDto[]
+  slots: AvailabilitySlot[]
 }
 
-export type ApiAvailabilityResponseDto = {
-  data: ApiAvailabilityDataDto
-}
-
-export type ApiCreateAppointmentRequestDto = {
+export type CreateAppointmentPayload = {
   service_id: string
-  date: ApiDateDto
-  time: ApiTimeDto
+  date: ApiDate
+  time: ApiTime
   customer_name: string
   customer_phone: string
 }
 
-export type ApiAppointmentServiceDto = {
-  id: string
-  name: string
-  duration_minutes: number
-}
-
-export type ApiAppointmentDto = {
+export type Appointment = {
   id: string
   confirmation_code: string
   customer_name: string
   customer_phone: string
-  service: ApiAppointmentServiceDto
+  service: {
+    id: string
+    name: string
+    duration_minutes: number
+  }
   scheduled_at: string
-  status: ApiAppointmentStatusDto
+  status: AppointmentStatus
   created_at: string
   updated_at: string
 }
 
-export type ApiAppointmentResponseDto = {
-  data: ApiAppointmentDto
-}
-
-export type ApiErrorResponseDto = {
+export type ApiError = {
   error: {
     code: string
     message: string

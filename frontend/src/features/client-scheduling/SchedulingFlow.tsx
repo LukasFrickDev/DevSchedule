@@ -2,6 +2,7 @@ import type { FormEvent, ReactNode } from 'react'
 import styled, { css, keyframes } from 'styled-components'
 
 import { formatApiDate, formatScheduledAt } from './date'
+import { normalizeAndFormatPhone } from './phone'
 import type { SchedulingFlowController } from './useSchedulingFlow'
 
 const Main = styled.main`
@@ -514,8 +515,8 @@ function Summary({ flow }: { flow: SchedulingFlowController }) {
       <ReviewItem>
         <dt>Duração</dt>
         <dd>
-          {appointment?.service.durationMinutes ??
-            flow.selectedService?.durationMinutes}{' '}
+          {appointment?.service.duration_minutes ??
+            flow.selectedService?.duration_minutes}{' '}
           minutos
         </dd>
       </ReviewItem>
@@ -523,15 +524,17 @@ function Summary({ flow }: { flow: SchedulingFlowController }) {
         <dt>Data e horário</dt>
         <dd>
           {appointment
-            ? formatScheduledAt(appointment.scheduledAt)
+            ? formatScheduledAt(appointment.scheduled_at)
             : `${formatApiDate(flow.apiDate!)} às ${flow.selectedTime}`}
         </dd>
       </ReviewItem>
       <ReviewItem>
         <dt>Cliente</dt>
         <dd>
-          {appointment?.customerName ?? flow.name} ·{' '}
-          {appointment?.customerPhone ?? flow.phone}
+          {appointment?.customer_name ?? flow.name} ·{' '}
+          {appointment
+            ? normalizeAndFormatPhone(appointment.customer_phone)
+            : flow.phone}
         </dd>
       </ReviewItem>
     </ReviewList>
@@ -587,7 +590,7 @@ function ServiceStep({ flow }: { flow: SchedulingFlowController }) {
               >
                 <ServiceTop>
                   <ServiceName>{service.name}</ServiceName>
-                  <Duration>{service.durationMinutes} min</Duration>
+                  <Duration>{service.duration_minutes} min</Duration>
                 </ServiceTop>
                 <ServiceDescription>{service.description}</ServiceDescription>
                 {selected && <SelectionText>Selecionado</SelectionText>}
@@ -623,7 +626,7 @@ function ScheduleStep({ flow }: { flow: SchedulingFlowController }) {
             <strong>{flow.selectedService.name}</strong>
             <span>{flow.selectedService.description}</span>
           </div>
-          <Duration>{flow.selectedService.durationMinutes} min</Duration>
+          <Duration>{flow.selectedService.duration_minutes} min</Duration>
         </SummaryStrip>
       )}
       <FormGroup>
@@ -810,7 +813,7 @@ function SuccessStep({ flow }: { flow: SchedulingFlowController }) {
     >
       <ResultMark aria-hidden="true">✓</ResultMark>
       <ConfirmationCode>
-        Código {flow.appointment?.confirmationCode}
+        Código {flow.appointment?.confirmation_code}
       </ConfirmationCode>
       <Summary flow={flow} />
       <Actions>

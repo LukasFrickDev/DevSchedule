@@ -1,4 +1,4 @@
-import type { ApiDate } from './types'
+import type { ApiDate } from './api/types'
 
 function pad(value: number) {
   return String(value).padStart(2, '0')

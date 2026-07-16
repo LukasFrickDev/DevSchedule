@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { AppProviders } from '../app/providers'
 import { fixtureSchedulingApi } from '../features/client-scheduling/api/fixtureSchedulingApi'
 import { normalizeAndFormatPhone } from '../features/client-scheduling/phone'
-import type { Appointment } from '../features/client-scheduling/types'
+import type { Appointment } from '../features/client-scheduling/api/types'
 import { ClientHome } from './ClientHome'
 
 function renderClientHome(scenario?: string) {
@@ -193,18 +193,18 @@ describe('ClientHome', () => {
   it('usa o Appointment devolvido pelo gateway na confirmação', async () => {
     const returnedAppointment: Appointment = {
       id: '8a130410-2d2f-4f58-b6b3-dfb7cb0eb43c',
-      confirmationCode: 'API-9001',
-      customerName: 'Nome devolvido pela API',
-      customerPhone: '(21) 98888-7777',
+      confirmation_code: 'API-9001',
+      customer_name: 'Nome devolvido pela API',
+      customer_phone: '21988887777',
       service: {
         id: 'c149960b-55b9-4847-b197-79bc24131219',
         name: 'Serviço devolvido pela API',
-        durationMinutes: 30,
+        duration_minutes: 30,
       },
-      scheduledAt: '2026-08-20T14:00:00-03:00',
+      scheduled_at: '2026-08-20T14:00:00-03:00',
       status: 'SCHEDULED',
-      createdAt: '2026-07-16T17:00:00-03:00',
-      updatedAt: '2026-07-16T17:00:00-03:00',
+      created_at: '2026-07-16T17:00:00-03:00',
+      updated_at: '2026-07-16T17:00:00-03:00',
     }
     vi.spyOn(fixtureSchedulingApi, 'createAppointment').mockResolvedValueOnce(
       returnedAppointment,

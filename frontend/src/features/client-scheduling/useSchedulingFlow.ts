@@ -10,19 +10,15 @@ import {
   getFixtureScenario,
   isApiError,
 } from './api/fixtureSchedulingApi'
-import { normalizeAndFormatPhone } from './phone'
 import type {
+  ApiTime,
   Appointment,
-  AvailabilityConflict,
-  AvailabilityResponse,
+  Availability,
   AvailabilitySlot,
-  FixtureScenario,
   Service,
-  Time,
-} from './types'
-
-export type FlowStep =
-  'service' | 'schedule' | 'details' | 'review' | 'success' | 'conflict'
+} from './api/types'
+import { normalizeAndFormatPhone } from './phone'
+import type { AvailabilityConflict, FixtureScenario, FlowStep } from './types'
 
 type AsyncState<T> =
   | { status: 'idle' | 'loading'; data: T }
@@ -30,25 +26,25 @@ type AsyncState<T> =
   | { status: 'error'; data: T; message: string }
 
 const emptyServices: Service[] = []
-const emptyAvailability: AvailabilityResponse | null = null
+const emptyAvailability: Availability | null = null
 
 export function matchesAvailabilityConflict(
   conflict: AvailabilityConflict | null,
-  serviceId: string,
-  date: AvailabilityResponse['date'] | null,
-  start: Time,
+  service_id: string,
+  date: Availability['date'] | null,
+  start: ApiTime,
 ) {
   return Boolean(
     conflict &&
     date &&
-    conflict.serviceId === serviceId &&
+    conflict.service_id === service_id &&
     conflict.date === date &&
     conflict.start === start,
   )
 }
 
 function readableError(error: unknown, fallback: string) {
-  return isApiError(error) ? error.message : fallback
+  return isApiError(error) ? error.error.message : fallback
 }
 
 export function useSchedulingFlow() {
@@ -61,9 +57,9 @@ export function useSchedulingFlow() {
   const [servicesRequest, setServicesRequest] = useState(0)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [inputDate, setInputDate] = useState('')
-  const [selectedTime, setSelectedTime] = useState<Time | null>(null)
+  const [selectedTime, setSelectedTime] = useState<ApiTime | null>(null)
   const [availability, setAvailability] = useState<
-    AsyncState<AvailabilityResponse | null>
+    AsyncState<Availability | null>
   >({ status: 'idle', data: emptyAvailability })
   const [availabilityRequest, setAvailabilityRequest] = useState(0)
   const [name, setName] = useState('')
@@ -213,20 +209,20 @@ export function useSchedulingFlow() {
     try {
       const created = await fixtureSchedulingApi.createAppointment(
         {
-          serviceId: selectedService.id,
+          service_id: selectedService.id,
           date: apiDate,
           time: selectedTime,
-          customerName: name.trim(),
-          customerPhone: phone.trim(),
+          customer_name: name.trim(),
+          customer_phone: phone.replace(/\D/g, ''),
         },
         scenario,
       )
       setAppointment(created)
       setStep('success')
     } catch (error: unknown) {
-      if (isApiError(error) && error.code === 'slot_unavailable') {
+      if (isApiError(error) && error.error.code === 'slot_unavailable') {
         setAvailabilityConflict({
-          serviceId: selectedService.id,
+          service_id: selectedService.id,
           date: apiDate,
           start: selectedTime,
         })

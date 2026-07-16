@@ -1,12 +1,11 @@
 import type {
-  ApiAppointmentResponseDto,
-  ApiAppointmentServiceDto,
-  ApiAvailabilityResponseDto,
-  ApiCreateAppointmentRequestDto,
-  ApiDateDto,
-  ApiErrorResponseDto,
-  ApiServicesResponseDto,
-  ApiTimeDto,
+  ApiDate,
+  ApiError,
+  ApiTime,
+  Appointment,
+  Availability,
+  CreateAppointmentPayload,
+  Service,
 } from './types'
 
 export const servicesResponseFixture = {
@@ -33,28 +32,28 @@ export const servicesResponseFixture = {
       duration_minutes: 30,
     },
   ],
-} satisfies ApiServicesResponseDto
+} satisfies { data: Service[] }
 
 export const serviceErrorFixture = {
   error: {
     code: 'services_unavailable',
     message: 'Não foi possível carregar os serviços.',
   },
-} satisfies ApiErrorResponseDto
+} satisfies ApiError
 
 export const availabilityErrorFixture = {
   error: {
     code: 'availability_unavailable',
     message: 'Não foi possível consultar a agenda.',
   },
-} satisfies ApiErrorResponseDto
+} satisfies ApiError
 
 export const conflictErrorFixture = {
   error: {
     code: 'slot_unavailable',
     message: 'O horário escolhido não está mais disponível.',
   },
-} satisfies ApiErrorResponseDto
+} satisfies ApiError
 
 export const availabilityStarts = [
   '09:00',
@@ -66,52 +65,52 @@ export const availabilityStarts = [
   '15:00',
   '16:00',
   '17:00',
-] satisfies ApiTimeDto[]
+] satisfies ApiTime[]
 
-const unavailableStarts = new Set<ApiTimeDto>(['10:00', '12:00', '15:00'])
+const unavailableStarts = new Set<ApiTime>(['10:00', '12:00', '15:00'])
 
 export function addMinutesToTime(
-  start: ApiTimeDto,
-  durationMinutes: number,
-): ApiTimeDto {
+  start: ApiTime,
+  duration_minutes: number,
+): ApiTime {
   const [hours, minutes] = start.split(':').map(Number)
-  const total = hours * 60 + minutes + durationMinutes
+  const total = hours * 60 + minutes + duration_minutes
   const endHours = String(Math.floor(total / 60)).padStart(2, '0')
   const endMinutes = String(total % 60).padStart(2, '0')
-  return `${endHours}:${endMinutes}` as ApiTimeDto
+  return `${endHours}:${endMinutes}` as ApiTime
 }
 
 export function buildAvailabilityResponseFixture(
-  serviceId: string,
-  date: ApiDateDto,
-  durationMinutes: number,
+  service_id: string,
+  date: ApiDate,
+  duration_minutes: number,
   empty = false,
-): ApiAvailabilityResponseDto {
+): { data: Availability } {
   return {
     data: {
-      service_id: serviceId,
+      service_id,
       date,
       timezone: 'America/Sao_Paulo',
       slots: empty
         ? []
         : availabilityStarts.map((start) => ({
             start,
-            end: addMinutesToTime(start, durationMinutes),
+            end: addMinutesToTime(start, duration_minutes),
             available: !unavailableStarts.has(start),
           })),
     },
   }
 }
 
-function toIsoTimestamp(date: ApiDateDto, time: ApiTimeDto) {
+function toIsoTimestamp(date: ApiDate, time: ApiTime) {
   const [day, month, year] = date.split('-')
   return `${year}-${month}-${day}T${time}:00-03:00`
 }
 
 export function buildAppointmentResponseFixture(
-  request: ApiCreateAppointmentRequestDto,
-  service: ApiAppointmentServiceDto,
-): ApiAppointmentResponseDto {
+  request: CreateAppointmentPayload,
+  service: Appointment['service'],
+): { data: Appointment } {
   const now = '2026-07-16T17:00:00-03:00'
   return {
     data: {

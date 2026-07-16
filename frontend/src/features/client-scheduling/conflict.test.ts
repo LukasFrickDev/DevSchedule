@@ -5,7 +5,7 @@ import { matchesAvailabilityConflict } from './useSchedulingFlow'
 
 describe('identidade do conflito de disponibilidade', () => {
   const conflict: AvailabilityConflict = {
-    serviceId: '81ef3676-5987-441c-af89-6e9ad30b6014',
+    service_id: '81ef3676-5987-441c-af89-6e9ad30b6014',
     date: '21-07-2026',
     start: '09:00',
   }

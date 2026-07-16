@@ -1,10 +1,4 @@
-import {
-  mapAppointmentResponseDto,
-  mapAvailabilityResponseDto,
-  mapCreateAppointmentInputToDto,
-  mapErrorResponseDto,
-  mapServicesResponseDto,
-} from './mappers'
+import type { FixtureScenario } from '../types'
 import {
   availabilityErrorFixture,
   buildAppointmentResponseFixture,
@@ -13,15 +7,14 @@ import {
   serviceErrorFixture,
   servicesResponseFixture,
 } from './fixtures'
-import type { ApiDateDto, ApiErrorResponseDto } from './types'
 import type {
+  ApiDate,
   ApiError,
   Appointment,
-  AvailabilityResponse,
-  CreateAppointmentInput,
-  FixtureScenario,
+  Availability,
+  CreateAppointmentPayload,
   Service,
-} from '../types'
+} from './types'
 
 const latency = import.meta.env.MODE === 'test' ? 0 : 450
 
@@ -33,22 +26,21 @@ function waitForever<T>() {
   return new Promise<T>(() => undefined)
 }
 
-function apiError(status: number, response: ApiErrorResponseDto): ApiError {
-  return mapErrorResponseDto(status, response)
-}
-
-function isWeekend(date: ApiDateDto) {
+function isWeekend(date: ApiDate) {
   const [day, month, year] = date.split('-').map(Number)
   const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay()
   return weekday === 0 || weekday === 6
 }
 
-export function isApiError(error: unknown): error is ApiError {
+export function isApiError(value: unknown): value is ApiError {
   return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    'message' in error
+    typeof value === 'object' &&
+    value !== null &&
+    'error' in value &&
+    typeof value.error === 'object' &&
+    value.error !== null &&
+    'code' in value.error &&
+    'message' in value.error
   )
 }
 
@@ -56,68 +48,65 @@ export const fixtureSchedulingApi = {
   async listServices(scenario: FixtureScenario): Promise<Service[]> {
     if (scenario === 'services-loading') return waitForever()
     await wait()
-    if (scenario === 'services-error') throw apiError(503, serviceErrorFixture)
+    if (scenario === 'services-error') throw serviceErrorFixture
     if (scenario === 'services-empty') return []
-    return mapServicesResponseDto(servicesResponseFixture)
+    return servicesResponseFixture.data
   },
 
   async getAvailability(
-    serviceId: string,
-    date: AvailabilityResponse['date'],
+    service_id: string,
+    date: Availability['date'],
     scenario: FixtureScenario,
-  ): Promise<AvailabilityResponse> {
+  ): Promise<Availability> {
     if (scenario === 'availability-loading') return waitForever()
     await wait()
-    if (scenario === 'availability-error') {
-      throw apiError(503, availabilityErrorFixture)
-    }
+    if (scenario === 'availability-error') throw availabilityErrorFixture
+
     const service = servicesResponseFixture.data.find(
-      (item) => item.id === serviceId,
+      (item) => item.id === service_id,
     )
     if (!service) {
-      throw apiError(404, {
+      throw {
         error: {
           code: 'service_not_found',
           message: 'Serviço não encontrado.',
         },
-      })
+      } satisfies ApiError
     }
+
     const empty = scenario === 'availability-empty' || isWeekend(date)
-    return mapAvailabilityResponseDto(
-      buildAvailabilityResponseFixture(
-        serviceId,
-        date,
-        service.duration_minutes,
-        empty,
-      ),
-    )
+    return buildAvailabilityResponseFixture(
+      service_id,
+      date,
+      service.duration_minutes,
+      empty,
+    ).data
   },
 
   async createAppointment(
-    input: CreateAppointmentInput,
+    payload: CreateAppointmentPayload,
     scenario: FixtureScenario,
   ): Promise<Appointment> {
     await wait(import.meta.env.MODE === 'test' ? 0 : 700)
-    if (scenario === 'conflict') throw apiError(409, conflictErrorFixture)
-    const request = mapCreateAppointmentInputToDto(input)
+    if (scenario === 'conflict') throw conflictErrorFixture
+
     const service = servicesResponseFixture.data.find(
-      (item) => item.id === request.service_id,
+      (item) => item.id === payload.service_id,
     )
     if (!service) {
-      throw apiError(404, {
+      throw {
         error: {
           code: 'service_not_found',
           message: 'Serviço não encontrado.',
         },
-      })
+      } satisfies ApiError
     }
-    return mapAppointmentResponseDto(
-      buildAppointmentResponseFixture(request, {
-        id: service.id,
-        name: service.name,
-        duration_minutes: service.duration_minutes,
-      }),
-    )
+
+    return buildAppointmentResponseFixture(payload, {
+      id: service.id,
+      name: service.name,
+      duration_minutes: service.duration_minutes,
+    }).data
   },
 }
 
