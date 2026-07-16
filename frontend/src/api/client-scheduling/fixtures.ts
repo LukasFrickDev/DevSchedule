@@ -6,7 +6,7 @@ import type {
   Availability,
   CreateAppointmentPayload,
   Service,
-} from './types'
+} from '../../types'
 
 export const servicesResponseFixture = {
   data: [
@@ -18,32 +18,32 @@ export const servicesResponseFixture = {
       duration_minutes: 60,
     },
     {
-      id: '0f52181c-c086-42e0-89ea-a931e34b82ca',
-      name: 'Revisão de projeto',
-      description:
-        'Análise de código, estrutura e boas práticas com feedback objetivo para evolução do projeto.',
-      duration_minutes: 45,
-    },
-    {
       id: 'c690fd99-8482-4677-8199-1dcbe8e44aa2',
       name: 'Orientação de carreira',
       description:
         'Conversa focada em currículo, portfólio, posicionamento profissional e próximos passos.',
       duration_minutes: 30,
     },
+    {
+      id: '0f52181c-c086-42e0-89ea-a931e34b82ca',
+      name: 'Revisão de projeto',
+      description:
+        'Análise de código, estrutura e boas práticas com feedback objetivo para evolução do projeto.',
+      duration_minutes: 45,
+    },
   ],
 } satisfies { data: Service[] }
 
 export const serviceErrorFixture = {
   error: {
-    code: 'services_unavailable',
+    code: 'internal_error',
     message: 'Não foi possível carregar os serviços.',
   },
 } satisfies ApiError
 
 export const availabilityErrorFixture = {
   error: {
-    code: 'availability_unavailable',
+    code: 'internal_error',
     message: 'Não foi possível consultar a agenda.',
   },
 } satisfies ApiError

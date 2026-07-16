@@ -1,8 +1,5 @@
-import { SchedulingFlow } from '../features/client-scheduling/SchedulingFlow'
-import { useSchedulingFlow } from '../features/client-scheduling/useSchedulingFlow'
+import { SchedulingFlow } from '../components/SchedulingFlow'
 
 export function ClientHome() {
-  const flow = useSchedulingFlow()
-
-  return <SchedulingFlow flow={flow} />
+  return <SchedulingFlow />
 }

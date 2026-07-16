@@ -1,24 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
 
 import {
-  inputDateToApiDate,
-  isValidFutureOrToday,
-  todayAsInputDate,
-} from './date'
-import {
   fixtureSchedulingApi,
   getFixtureScenario,
   isApiError,
-} from './api/fixtureSchedulingApi'
+} from '../api/client-scheduling/fixtureSchedulingApi'
 import type {
   ApiTime,
   Appointment,
   Availability,
+  AvailabilityConflict,
   AvailabilitySlot,
+  FixtureScenario,
+  FlowStep,
   Service,
-} from './api/types'
-import { normalizeAndFormatPhone } from './phone'
-import type { AvailabilityConflict, FixtureScenario, FlowStep } from './types'
+} from '../types'
+import {
+  inputDateToApiDate,
+  isValidFutureOrToday,
+  todayAsInputDate,
+} from '../utils/date'
+import { normalizeAndFormatPhone } from '../utils/phone'
 
 type AsyncState<T> =
   | { status: 'idle' | 'loading'; data: T }

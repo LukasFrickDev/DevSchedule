@@ -1,9 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 
 import { AppProviders } from '../app/providers'
-import { fixtureSchedulingApi } from '../features/client-scheduling/api/fixtureSchedulingApi'
-import { normalizeAndFormatPhone } from '../features/client-scheduling/phone'
-import type { Appointment } from '../features/client-scheduling/api/types'
+import { fixtureSchedulingApi } from '../api/client-scheduling/fixtureSchedulingApi'
+import type { Appointment } from '../types'
+import { normalizeAndFormatPhone } from '../utils/phone'
 import { ClientHome } from './ClientHome'
 
 function renderClientHome(scenario?: string) {

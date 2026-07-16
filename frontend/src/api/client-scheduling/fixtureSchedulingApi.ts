@@ -1,4 +1,12 @@
-import type { FixtureScenario } from '../types'
+import type {
+  ApiDate,
+  ApiError,
+  Appointment,
+  Availability,
+  CreateAppointmentPayload,
+  FixtureScenario,
+  Service,
+} from '../../types'
 import {
   availabilityErrorFixture,
   buildAppointmentResponseFixture,
@@ -7,14 +15,6 @@ import {
   serviceErrorFixture,
   servicesResponseFixture,
 } from './fixtures'
-import type {
-  ApiDate,
-  ApiError,
-  Appointment,
-  Availability,
-  CreateAppointmentPayload,
-  Service,
-} from './types'
 
 const latency = import.meta.env.MODE === 'test' ? 0 : 450
 
@@ -68,7 +68,7 @@ export const fixtureSchedulingApi = {
     if (!service) {
       throw {
         error: {
-          code: 'service_not_found',
+          code: 'not_found',
           message: 'Serviço não encontrado.',
         },
       } satisfies ApiError
@@ -96,7 +96,7 @@ export const fixtureSchedulingApi = {
     if (!service) {
       throw {
         error: {
-          code: 'service_not_found',
+          code: 'not_found',
           message: 'Serviço não encontrado.',
         },
       } satisfies ApiError

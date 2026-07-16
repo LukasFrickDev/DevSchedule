@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { AvailabilityConflict } from './types'
+import type { AvailabilityConflict } from '../types'
 import { matchesAvailabilityConflict } from './useSchedulingFlow'
 
 describe('identidade do conflito de disponibilidade', () => {

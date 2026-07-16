@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
+import type { ApiErrorCode } from '../../types'
 import { fixtureSchedulingApi } from './fixtureSchedulingApi'
 import {
   addMinutesToTime,
+  availabilityErrorFixture,
   buildAppointmentResponseFixture,
+  conflictErrorFixture,
+  serviceErrorFixture,
   servicesResponseFixture,
 } from './fixtures'
 
@@ -28,7 +32,7 @@ describe('contrato externo e fixtures da API', () => {
     expect(services[0]).not.toHaveProperty('durationMinutes')
   })
 
-  it('possui somente os três serviços e durações aprovados', () => {
+  it('mantém os serviços em ordem alfabética com as durações aprovadas', () => {
     expect(servicesResponseFixture.data).toEqual([
       {
         id: '81ef3676-5987-441c-af89-6e9ad30b6014',
@@ -38,20 +42,36 @@ describe('contrato externo e fixtures da API', () => {
         duration_minutes: 60,
       },
       {
-        id: '0f52181c-c086-42e0-89ea-a931e34b82ca',
-        name: 'Revisão de projeto',
-        description:
-          'Análise de código, estrutura e boas práticas com feedback objetivo para evolução do projeto.',
-        duration_minutes: 45,
-      },
-      {
         id: 'c690fd99-8482-4677-8199-1dcbe8e44aa2',
         name: 'Orientação de carreira',
         description:
           'Conversa focada em currículo, portfólio, posicionamento profissional e próximos passos.',
         duration_minutes: 30,
       },
+      {
+        id: '0f52181c-c086-42e0-89ea-a931e34b82ca',
+        name: 'Revisão de projeto',
+        description:
+          'Análise de código, estrutura e boas práticas com feedback objetivo para evolução do projeto.',
+        duration_minutes: 45,
+      },
     ])
+  })
+
+  it('aceita somente os códigos de erro aprovados', () => {
+    const allowedCodes = [
+      'validation_error',
+      'authentication_failed',
+      'permission_denied',
+      'not_found',
+      'slot_unavailable',
+      'internal_error',
+    ] satisfies ApiErrorCode[]
+
+    expect(allowedCodes).toHaveLength(6)
+    expect(serviceErrorFixture.error.code).toBe('internal_error')
+    expect(availabilityErrorFixture.error.code).toBe('internal_error')
+    expect(conflictErrorFixture.error.code).toBe('slot_unavailable')
   })
 
   it('gera a resposta de criação com o contrato snake_case completo', () => {

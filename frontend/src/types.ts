@@ -4,6 +4,14 @@ export type ApiTime = `${number}:${number}`
 export type AppointmentStatus =
   'SCHEDULED' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED'
 
+export type ApiErrorCode =
+  | 'validation_error'
+  | 'authentication_failed'
+  | 'permission_denied'
+  | 'not_found'
+  | 'slot_unavailable'
+  | 'internal_error'
+
 export type Service = {
   id: string
   name: string
@@ -50,8 +58,27 @@ export type Appointment = {
 
 export type ApiError = {
   error: {
-    code: string
+    code: ApiErrorCode
     message: string
     fields?: Record<string, string[]>
   }
+}
+
+export type FlowStep =
+  'service' | 'schedule' | 'details' | 'review' | 'success' | 'conflict'
+
+export type FixtureScenario =
+  | 'default'
+  | 'services-loading'
+  | 'services-error'
+  | 'services-empty'
+  | 'availability-loading'
+  | 'availability-error'
+  | 'availability-empty'
+  | 'conflict'
+
+export type AvailabilityConflict = {
+  service_id: string
+  date: ApiDate
+  start: ApiTime
 }
