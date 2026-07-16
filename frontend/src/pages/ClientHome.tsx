@@ -1,13 +1,8 @@
-import { PageShell } from '../components/PageShell'
+import { SchedulingFlow } from '../features/client-scheduling/SchedulingFlow'
+import { useSchedulingFlow } from '../features/client-scheduling/useSchedulingFlow'
 
 export function ClientHome() {
-  return (
-    <PageShell
-      eyebrow="Área do cliente"
-      title="Seu horário, do seu jeito."
-      description="A fundação do DevSchedule está pronta para receber a jornada de escolha de serviço, data, horário e confirmação."
-      actionLabel="Conhecer a área administrativa"
-      actionTo="/admin"
-    />
-  )
+  const flow = useSchedulingFlow()
+
+  return <SchedulingFlow flow={flow} />
 }
