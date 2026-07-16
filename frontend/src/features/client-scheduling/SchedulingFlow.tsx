@@ -1,7 +1,7 @@
 import type { FormEvent, ReactNode } from 'react'
 import styled, { css, keyframes } from 'styled-components'
 
-import { formatApiDate } from './date'
+import { formatApiDate, formatScheduledAt } from './date'
 import type { SchedulingFlowController } from './useSchedulingFlow'
 
 const Main = styled.main`
@@ -498,27 +498,40 @@ function FlowPanel({
 }
 
 function Summary({ flow }: { flow: SchedulingFlowController }) {
-  if (!flow.selectedService || !flow.apiDate || !flow.selectedTime) return null
+  const appointment = flow.step === 'success' ? flow.appointment : null
+  if (
+    !appointment &&
+    (!flow.selectedService || !flow.apiDate || !flow.selectedTime)
+  ) {
+    return null
+  }
   return (
     <ReviewList>
       <ReviewItem>
         <dt>Serviço</dt>
-        <dd>{flow.selectedService.name}</dd>
+        <dd>{appointment?.service.name ?? flow.selectedService?.name}</dd>
       </ReviewItem>
       <ReviewItem>
         <dt>Duração</dt>
-        <dd>{flow.selectedService.durationMinutes} minutos</dd>
+        <dd>
+          {appointment?.service.durationMinutes ??
+            flow.selectedService?.durationMinutes}{' '}
+          minutos
+        </dd>
       </ReviewItem>
       <ReviewItem>
         <dt>Data e horário</dt>
         <dd>
-          {formatApiDate(flow.apiDate)} às {flow.selectedTime}
+          {appointment
+            ? formatScheduledAt(appointment.scheduledAt)
+            : `${formatApiDate(flow.apiDate!)} às ${flow.selectedTime}`}
         </dd>
       </ReviewItem>
       <ReviewItem>
         <dt>Cliente</dt>
         <dd>
-          {flow.name} · {flow.phone}
+          {appointment?.customerName ?? flow.name} ·{' '}
+          {appointment?.customerPhone ?? flow.phone}
         </dd>
       </ReviewItem>
     </ReviewList>
@@ -661,18 +674,17 @@ function ScheduleStep({ flow }: { flow: SchedulingFlowController }) {
           <Legend>Horários disponíveis</Legend>
           <SlotGrid>
             {slots.map((slot) => {
-              const unavailable =
-                !slot.available || slot.time === flow.conflictedTime
+              const unavailable = flow.isSlotUnavailable(slot)
               return (
                 <SlotButton
-                  key={slot.time}
+                  key={slot.start}
                   type="button"
-                  $selected={flow.selectedTime === slot.time}
+                  $selected={flow.selectedTime === slot.start}
                   disabled={unavailable}
-                  aria-pressed={flow.selectedTime === slot.time}
+                  aria-pressed={flow.selectedTime === slot.start}
                   onClick={() => flow.chooseTime(slot)}
                 >
-                  {slot.time}
+                  {slot.start}
                   <span>{unavailable ? 'Indisponível' : 'Disponível'}</span>
                 </SlotButton>
               )

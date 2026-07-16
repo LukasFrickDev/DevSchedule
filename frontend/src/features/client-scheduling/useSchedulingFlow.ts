@@ -9,14 +9,16 @@ import {
   fixtureSchedulingApi,
   getFixtureScenario,
   isApiError,
-} from './fixtureApi'
+} from './api/fixtureSchedulingApi'
 import { normalizeAndFormatPhone } from './phone'
 import type {
   Appointment,
+  AvailabilityConflict,
   AvailabilityResponse,
   AvailabilitySlot,
   FixtureScenario,
   Service,
+  Time,
 } from './types'
 
 export type FlowStep =
@@ -29,6 +31,21 @@ type AsyncState<T> =
 
 const emptyServices: Service[] = []
 const emptyAvailability: AvailabilityResponse | null = null
+
+export function matchesAvailabilityConflict(
+  conflict: AvailabilityConflict | null,
+  serviceId: string,
+  date: AvailabilityResponse['date'] | null,
+  start: Time,
+) {
+  return Boolean(
+    conflict &&
+    date &&
+    conflict.serviceId === serviceId &&
+    conflict.date === date &&
+    conflict.start === start,
+  )
+}
 
 function readableError(error: unknown, fallback: string) {
   return isApiError(error) ? error.message : fallback
@@ -44,9 +61,7 @@ export function useSchedulingFlow() {
   const [servicesRequest, setServicesRequest] = useState(0)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [inputDate, setInputDate] = useState('')
-  const [selectedTime, setSelectedTime] = useState<
-    AvailabilitySlot['time'] | null
-  >(null)
+  const [selectedTime, setSelectedTime] = useState<Time | null>(null)
   const [availability, setAvailability] = useState<
     AsyncState<AvailabilityResponse | null>
   >({ status: 'idle', data: emptyAvailability })
@@ -61,9 +76,8 @@ export function useSchedulingFlow() {
   const [submitting, setSubmitting] = useState(false)
   const submittingRef = useRef(false)
   const [appointment, setAppointment] = useState<Appointment | null>(null)
-  const [conflictedTime, setConflictedTime] = useState<
-    AvailabilitySlot['time'] | null
-  >(null)
+  const [availabilityConflict, setAvailabilityConflict] =
+    useState<AvailabilityConflict | null>(null)
 
   const apiDate = inputDateToApiDate(inputDate)
 
@@ -144,8 +158,17 @@ export function useSchedulingFlow() {
   }
 
   function chooseTime(slot: AvailabilitySlot) {
-    if (slot.available && slot.time !== conflictedTime) {
-      setSelectedTime(slot.time)
+    if (
+      slot.available &&
+      selectedService &&
+      !matchesAvailabilityConflict(
+        availabilityConflict,
+        selectedService.id,
+        apiDate,
+        slot.start,
+      )
+    ) {
+      setSelectedTime(slot.start)
       setScheduleError('')
     }
   }
@@ -202,7 +225,11 @@ export function useSchedulingFlow() {
       setStep('success')
     } catch (error: unknown) {
       if (isApiError(error) && error.code === 'slot_unavailable') {
-        setConflictedTime(selectedTime)
+        setAvailabilityConflict({
+          serviceId: selectedService.id,
+          date: apiDate,
+          start: selectedTime,
+        })
         setStep('conflict')
       }
     } finally {
@@ -228,7 +255,7 @@ export function useSchedulingFlow() {
     setFieldErrors({})
     setScheduleError('')
     setAppointment(null)
-    setConflictedTime(null)
+    setAvailabilityConflict(null)
   }
 
   return {
@@ -245,12 +272,24 @@ export function useSchedulingFlow() {
     scheduleError,
     submitting,
     appointment,
-    conflictedTime,
+    availabilityConflict,
+    conflictedTime: availabilityConflict?.start ?? null,
     minDate: todayAsInputDate(),
     chooseService,
     continueFromService,
     changeDate,
     chooseTime,
+    isSlotUnavailable: (slot: AvailabilitySlot) =>
+      !slot.available ||
+      Boolean(
+        selectedService &&
+        matchesAvailabilityConflict(
+          availabilityConflict,
+          selectedService.id,
+          apiDate,
+          slot.start,
+        ),
+      ),
     setName,
     setPhone: (value: string) => setPhone(normalizeAndFormatPhone(value)),
     continueFromSchedule,

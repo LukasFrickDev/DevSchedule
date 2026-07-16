@@ -22,6 +22,13 @@ export function formatApiDate(value: ApiDate) {
   return `${day}/${month}/${year}`
 }
 
+export function formatScheduledAt(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2})/.exec(value)
+  if (!match) return value
+  const [, year, month, day, time] = match
+  return `${day}/${month}/${year} às ${time}`
+}
+
 export function isValidFutureOrToday(value: string) {
   return /^\d{4}-\d{2}-\d{2}$/.test(value) && value >= todayAsInputDate()
 }
