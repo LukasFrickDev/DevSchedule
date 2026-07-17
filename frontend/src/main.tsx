@@ -1,3 +1,6 @@
+import '@fontsource-variable/albert-sans/wght.css'
+import '@fontsource/aldrich/latin-400.css'
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
