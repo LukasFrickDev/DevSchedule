@@ -80,5 +80,19 @@ class AppointmentSerializer(serializers.ModelSerializer):
         return timezone.make_aware(scheduled_at, timezone.get_current_timezone())
 
 
+class AdminLoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150, trim_whitespace=True)
+    password = serializers.CharField(trim_whitespace=False)
+
+
+class AdminAppointmentListQuerySerializer(serializers.Serializer):
+    date = serializers.DateField(input_formats=["%d-%m-%Y"], required=False)
+    page = serializers.IntegerField(min_value=1, required=False, default=1)
+
+
+class UpdateAppointmentStatusSerializer(serializers.Serializer):
+    status = serializers.ChoiceField(choices=Appointment.Status.values)
+
+
 def slot_end(start: time) -> time:
     return (datetime.combine(timezone.localdate(), start) + timedelta(hours=1)).time()
