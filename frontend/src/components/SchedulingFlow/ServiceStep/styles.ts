@@ -6,6 +6,10 @@ export const ServiceGrid = styled.div`
   gap: ${({ theme }) => theme.spacing.md};
 
   @media (max-width: 48rem) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 38rem) {
     grid-template-columns: 1fr;
   }
 `
@@ -36,6 +40,10 @@ export const ServiceButton = styled.button<{ $selected: boolean }>`
     outline: 3px solid ${({ theme }) => theme.colors.secondary};
     outline-offset: 3px;
   }
+
+  @media (max-width: 38rem) {
+    min-height: 0;
+  }
 `
 
 export const ServiceTop = styled.span`
@@ -55,7 +63,7 @@ export const ServiceDescription = styled.span`
   margin-top: ${({ theme }) => theme.spacing.md};
   color: ${({ theme }) => theme.colors.textMuted};
   line-height: 1.5;
-  font-family: ${({ theme }) => theme.fonts.body}
+  font-family: ${({ theme }) => theme.fonts.body};
 `
 
 export const SelectionText = styled.span`

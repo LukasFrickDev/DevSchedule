@@ -4,6 +4,7 @@ import type {
   ApiError,
   Appointment,
   AppointmentStatus,
+  Service,
 } from '../../types'
 
 const apiBaseUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '')
@@ -45,6 +46,12 @@ async function request<T>(
 
   const payload: unknown = await response.json().catch(() => null)
   if (!response.ok) {
+    if (response.status === 401) {
+      throw apiError(
+        'authentication_failed',
+        'Sua sessão administrativa expirou.',
+      )
+    }
     if (isApiError(payload)) throw payload
     throw apiError('internal_error', 'Não foi possível concluir a solicitação.')
   }
@@ -53,18 +60,41 @@ async function request<T>(
 }
 
 export const adminApi = {
-  async login(username: string, password: string): Promise<string> {
-    const response = await request<{ data: { token: string } }>('/admin/login/', undefined, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    })
-    return response.data.token
+  async login(
+    username: string,
+    password: string,
+  ): Promise<{ access: string; refresh: string }> {
+    return request<{ access: string; refresh: string }>(
+      '/admin/login/',
+      undefined,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      },
+    )
   },
 
-  listAppointments(token: string, date?: ApiDate): Promise<AdminAppointmentsResponse> {
-    const searchParams = new URLSearchParams({ page: '1' })
+  async listServices(): Promise<Service[]> {
+    const response = await request<{ data: Service[] }>('/services/')
+    return response.data
+  },
+
+  listAppointments(
+    token: string,
+    date?: ApiDate,
+    page = 1,
+    pageSize = 10,
+    serviceId?: string,
+    status?: AppointmentStatus,
+  ): Promise<AdminAppointmentsResponse> {
+    const searchParams = new URLSearchParams({
+      page: String(page),
+      page_size: String(pageSize),
+    })
     if (date) searchParams.set('date', date)
+    if (serviceId) searchParams.set('service_id', serviceId)
+    if (status) searchParams.set('status', status)
     return request<AdminAppointmentsResponse>(
       `/admin/appointments/?${searchParams}`,
       token,
@@ -76,20 +106,30 @@ export const adminApi = {
     id: string,
     status: AppointmentStatus,
   ): Promise<Appointment> {
-    return request<{ data: Appointment }>(`/admin/appointments/${id}/status/`, token, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    }).then((response) => response.data)
+    return request<{ data: Appointment }>(
+      `/admin/appointments/${id}/status/`,
+      token,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      },
+    ).then((response) => response.data)
   },
 
   cancelAppointment(token: string, id: string): Promise<Appointment> {
-    return request<{ data: Appointment }>(`/admin/appointments/${id}/cancel/`, token, {
-      method: 'POST',
-    }).then((response) => response.data)
+    return request<{ data: Appointment }>(
+      `/admin/appointments/${id}/cancel/`,
+      token,
+      {
+        method: 'POST',
+      },
+    ).then((response) => response.data)
   },
 
   async deleteAppointment(token: string, id: string): Promise<void> {
-    await request<void>(`/admin/appointments/${id}/`, token, { method: 'DELETE' })
+    await request<void>(`/admin/appointments/${id}/`, token, {
+      method: 'DELETE',
+    })
   },
 }

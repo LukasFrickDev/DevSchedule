@@ -1,5 +1,6 @@
 import type { SchedulingFlowController } from '../../../hooks/useSchedulingFlow'
 import { formatApiDate } from '../../../utils/date'
+import { Calendar } from '../../Calendar'
 import { FlowPanel } from '../FlowPanel'
 import {
   Actions,
@@ -7,7 +8,6 @@ import {
   Duration,
   ErrorText,
   FormGroup,
-  Input,
   Label,
   Loader,
   StateBox,
@@ -40,14 +40,16 @@ export function DateTimeStep({ flow }: { flow: SchedulingFlowController }) {
         </SummaryStrip>
       )}
       <FormGroup>
-        <Label htmlFor="appointment-date">Data do atendimento</Label>
-        <Input
+        <Label id="appointment-date-label">Data do atendimento</Label>
+        <Calendar
           id="appointment-date"
-          type="date"
-          min={flow.minDate}
+          minDate={flow.minDate}
           value={flow.inputDate}
-          aria-describedby="date-hint schedule-error"
-          onChange={(event) => flow.changeDate(event.target.value)}
+          labelledBy="appointment-date-label"
+          aria-describedby={
+            flow.scheduleError ? 'date-hint schedule-error' : 'date-hint'
+          }
+          onChange={flow.changeDate}
         />
         <Hint id="date-hint">
           {flow.apiDate

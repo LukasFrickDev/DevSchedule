@@ -27,6 +27,22 @@ export const DashboardHeader = styled.header`
     display: block;
     margin-top: ${({ theme }) => theme.spacing.sm};
     color: ${({ theme }) => theme.colors.textMuted};
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    display: inline-flex;
+    margin-top: ${({ theme }) => theme.spacing.xs};
+    padding: ${({ theme }) => theme.spacing.xs}
+      ${({ theme }) => theme.spacing.sm};
+    border: 1px solid rgb(57 211 83 / 45%);
+    border-radius: ${({ theme }) => theme.radii.pill};
+    background: rgb(57 211 83 / 10%);
+    color: ${({ theme }) => theme.colors.primary};
+    font-size: 0.85rem;
   }
 
   @media (max-width: 48rem) {
@@ -127,49 +143,18 @@ export const ListHeader = styled.header`
 `
 
 export const FilterBar = styled.div`
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.md};
   align-items: end;
 
-  label {
-    grid-column: 1 / -1;
-    font-size: 0.78rem;
-    font-weight: 800;
-  }
-
-  input,
-  button {
-    min-height: 2.75rem;
-    border-radius: ${({ theme }) => theme.radii.sm};
-  }
-
-  input {
-    width: 100%;
-    min-width: 0;
-    padding: 0 ${({ theme }) => theme.spacing.sm};
-    border: 1px solid ${({ theme }) => theme.colors.border};
-    background: ${({ theme }) => theme.colors.surface};
-    color: ${({ theme }) => theme.colors.text};
-  }
-
-  input:focus-visible,
   button:focus-visible {
     outline: 3px solid ${({ theme }) => theme.colors.secondary};
     outline-offset: 2px;
   }
 
-  @media (max-width: 52rem) {
-    width: min(100%, 28rem);
-  }
-
   @media (max-width: 30rem) {
-    grid-template-columns: 1fr;
     width: 100%;
-
-    label {
-      grid-column: auto;
-    }
 
     button {
       width: 100%;
@@ -177,7 +162,36 @@ export const FilterBar = styled.div`
   }
 `
 
+export const FilterField = styled.div`
+  flex: 1 1 11rem;
+  min-width: min(100%, 11rem);
+
+  label {
+    display: block;
+    margin: ${({ theme }) => theme.spacing.xs};
+    font-size: 0.78rem;
+    font-weight: 800;
+  }
+
+  select {
+    width: 100%;
+    min-height: 3.25rem;
+    font-size: 0.78rem;
+    padding: 0 ${({ theme }) => theme.spacing.md};
+    border: 1px solid ${({ theme }) => theme.colors.border};
+    border-radius: ${({ theme }) => theme.radii.md};
+    background: ${({ theme }) => theme.colors.surfaceRaised};
+    color: ${({ theme }) => theme.colors.text};
+  }
+
+  @media (max-width: 30rem) {
+    flex-basis: 100%;
+  }
+`
+
 export const ClearButton = styled.button`
+  min-height: 3.25rem;
+  align-self: end;
   padding: 0 ${({ theme }) => theme.spacing.md};
   border: 1px solid ${({ theme }) => theme.colors.border};
   background: transparent;
@@ -188,6 +202,61 @@ export const ClearButton = styled.button`
   &:disabled {
     cursor: not-allowed;
     opacity: 0.45;
+  }
+`
+
+export const PaginationControls = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: ${({ theme }) => theme.spacing.sm};
+  margin-top: ${({ theme }) => theme.spacing.md};
+
+  label {
+    color: ${({ theme }) => theme.colors.textMuted};
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+
+  @media (max-width: 30rem) {
+    justify-content: stretch;
+
+    label {
+      width: 100%;
+    }
+  }
+`
+
+export const PageSizeSelect = styled.select`
+  min-height: 2.75rem;
+  padding: 0 ${({ theme }) => theme.spacing.sm};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 0.78rem;
+  font-weight: 800;
+`
+
+export const LoadMoreButton = styled.button`
+  min-height: 2.75rem;
+  padding: 0 ${({ theme }) => theme.spacing.md};
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.onPrimary};
+  font-weight: 900;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.55;
+  }
+
+  &:focus-visible {
+    outline: 3px solid ${({ theme }) => theme.colors.secondary};
+    outline-offset: 3px;
   }
 `
 

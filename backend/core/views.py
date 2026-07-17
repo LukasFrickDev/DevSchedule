@@ -1,14 +1,15 @@
 import uuid
 
 from django.contrib.auth import get_user_model
-from django.core import signing
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import IntegrityError, transaction
+from django.db.models import Count, Q
 from rest_framework import status
-from rest_framework.authentication import BaseAuthentication, get_authorization_header
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from core.models import Appointment, Service
 from core.serializers import (
@@ -25,33 +26,6 @@ from core.serializers import (
 
 DEMO_ADMIN_USERNAME = "admin"
 DEMO_ADMIN_PASSWORD = "devschedule"
-DEMO_TOKEN_SALT = "core.admin-demo-token"
-DEMO_TOKEN_MAX_AGE_SECONDS = 60 * 60 * 8
-ADMIN_PAGE_SIZE = 20
-
-
-class DemoBearerAuthentication(BaseAuthentication):
-    def authenticate(self, request):
-        authorization = get_authorization_header(request).split()
-        if len(authorization) != 2 or authorization[0].lower() != b"bearer":
-            return None
-
-        try:
-            payload = signing.loads(
-                authorization[1].decode(),
-                salt=DEMO_TOKEN_SALT,
-                max_age=DEMO_TOKEN_MAX_AGE_SECONDS,
-            )
-        except (UnicodeDecodeError, signing.BadSignature, signing.SignatureExpired):
-            return None
-
-        if payload.get("username") != DEMO_ADMIN_USERNAME:
-            return None
-
-        user = get_user_model().objects.filter(username=DEMO_ADMIN_USERNAME, is_active=True).first()
-        if user is None:
-            return None
-        return user, authorization[1]
 
 
 @api_view(["GET"])
@@ -141,7 +115,7 @@ def availability(request):
         )
 
     occupied_starts = set(
-        Appointment.objects.filter(service=service, date=selected_date)
+        Appointment.objects.filter(date=selected_date)
         .exclude(status=Appointment.Status.CANCELLED)
         .values_list("start", flat=True)
     )
@@ -185,7 +159,6 @@ def create_appointment(request):
     selected_date = payload.validated_data["date"]
     selected_start = payload.validated_data["time"]
     occupied_slot = Appointment.objects.filter(
-        service=service,
         date=selected_date,
         start=selected_start,
     ).exclude(status=Appointment.Status.CANCELLED)
@@ -241,15 +214,23 @@ def admin_login(request):
 
     user_model = get_user_model()
     user, created = user_model.objects.get_or_create(username=DEMO_ADMIN_USERNAME)
-    if created:
-        user.set_unusable_password()
-        user.save(update_fields=["password"])
-    token = signing.dumps({"username": user.username}, salt=DEMO_TOKEN_SALT)
-    return Response({"data": {"username": DEMO_ADMIN_USERNAME, "token": token}})
+    if (
+        created
+        or not user.check_password(DEMO_ADMIN_PASSWORD)
+        or not user.is_active
+        or not user.is_staff
+    ):
+        user.set_password(DEMO_ADMIN_PASSWORD)
+        user.is_active = True
+        user.is_staff = True
+        user.save()
+
+    refresh = RefreshToken.for_user(user)
+    return Response({"access": str(refresh.access_token), "refresh": str(refresh)})
 
 
 @api_view(["GET"])
-@authentication_classes([DemoBearerAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
 def list_admin_appointments(request):
     if not is_authenticated_admin(request):
@@ -262,11 +243,24 @@ def list_admin_appointments(request):
     appointments = Appointment.objects.select_related("service")
     selected_date = query.validated_data.get("date")
     if selected_date:
-        appointments = appointments.filter(date=selected_date).order_by("date", "start")
-    else:
-        appointments = appointments.order_by("-date", "-start")
+        appointments = appointments.filter(date=selected_date)
+    selected_service_id = query.validated_data.get("service_id")
+    if selected_service_id:
+        appointments = appointments.filter(service_id=selected_service_id)
+    selected_status = query.validated_data.get("status")
+    if selected_status:
+        appointments = appointments.filter(status=selected_status)
 
-    paginator = Paginator(appointments, ADMIN_PAGE_SIZE)
+    summary = appointments.aggregate(
+        total=Count("id"),
+        scheduled=Count("id", filter=Q(status=Appointment.Status.SCHEDULED)),
+        confirmed=Count("id", filter=Q(status=Appointment.Status.CONFIRMED)),
+        completed=Count("id", filter=Q(status=Appointment.Status.COMPLETED)),
+        cancelled=Count("id", filter=Q(status=Appointment.Status.CANCELLED)),
+    )
+    appointments = appointments.order_by("date", "start")
+
+    paginator = Paginator(appointments, query.validated_data["page_size"])
     try:
         page = paginator.page(query.validated_data["page"])
     except (EmptyPage, PageNotAnInteger):
@@ -284,13 +278,14 @@ def list_admin_appointments(request):
             "previous": (
                 page_url(request, page.previous_page_number()) if page.has_previous() else None
             ),
+            "summary": summary,
             "results": AppointmentSerializer(page.object_list, many=True).data,
         }
     )
 
 
 @api_view(["PATCH"])
-@authentication_classes([DemoBearerAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
 def update_admin_appointment_status(request, appointment_id):
     if not is_authenticated_admin(request):
@@ -318,7 +313,7 @@ def update_admin_appointment_status(request, appointment_id):
 
 
 @api_view(["POST"])
-@authentication_classes([DemoBearerAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
 def cancel_admin_appointment(request, appointment_id):
     if not is_authenticated_admin(request):
@@ -334,7 +329,7 @@ def cancel_admin_appointment(request, appointment_id):
 
 
 @api_view(["DELETE"])
-@authentication_classes([DemoBearerAuthentication])
+@authentication_classes([JWTAuthentication])
 @permission_classes([AllowAny])
 def delete_admin_appointment(request, appointment_id):
     if not is_authenticated_admin(request):

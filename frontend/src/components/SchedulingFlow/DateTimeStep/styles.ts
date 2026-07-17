@@ -16,6 +16,11 @@ export const SummaryStrip = styled.div`
     display: block;
   }
 
+  @media (max-width: 30rem) {
+    align-items: flex-start;
+    gap: ${({ theme }) => theme.spacing.md};
+  }
+
   span {
     color: ${({ theme }) => theme.colors.textMuted};
     font-size: 0.85rem;

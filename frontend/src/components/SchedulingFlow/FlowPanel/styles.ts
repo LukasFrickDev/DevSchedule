@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 export const Panel = styled.section`
-  overflow: hidden;
+  overflow: visible;
   border: 1px solid ${({ theme }) => theme.colors.border};
   border-radius: clamp(1rem, 3vw, 1.5rem);
   background:

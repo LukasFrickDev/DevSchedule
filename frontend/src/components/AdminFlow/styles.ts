@@ -29,7 +29,7 @@ export const Header = styled.header`
 
   @media (max-width: 40rem) {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: 1fr;
     gap: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
     margin-bottom: ${({ theme }) => theme.spacing.xl};
   }
@@ -42,20 +42,13 @@ export const Brand = styled.span`
   font-size: 1.05rem;
   font-weight: 900;
   letter-spacing: -0.02em;
+`
 
-  &::before {
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: 50%;
-    background: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 1.25rem
-      color-mix(
-        in srgb,
-        ${({ theme }) => theme.colors.primary} 65%,
-        transparent
-      );
-    content: '';
-  }
+export const BrandLogo = styled.img`
+  width: clamp(1.5rem, 3vw, 2rem);
+  height: clamp(1.5rem, 3vw, 2rem);
+  flex: 0 0 auto;
+  object-fit: contain;
 `
 
 export const AdminBadge = styled.span`
@@ -69,9 +62,49 @@ export const AdminBadge = styled.span`
   text-transform: uppercase;
 
   @media (max-width: 40rem) {
-    grid-row: 2;
-    grid-column: 1 / -1;
+    grid-row: 3;
+    grid-column: 1;
     justify-self: start;
+  }
+`
+
+export const HeaderActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  margin-left: auto;
+
+  @media (max-width: 40rem) {
+    grid-row: 2;
+    grid-column: 1;
+    flex-wrap: wrap;
+    gap: ${({ theme }) => theme.spacing.sm};
+    margin-left: 0;
+  }
+`
+
+export const LogoutButton = styled.button`
+  min-height: 2.75rem;
+  padding: 0 ${({ theme }) => theme.spacing.sm};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: transparent;
+  color: ${({ theme }) => theme.colors.text};
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+
+  @media (max-width: 30rem) {
+    flex: 1 1 auto;
+  }
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.secondary};
+  }
+
+  &:focus-visible {
+    outline: 3px solid ${({ theme }) => theme.colors.secondary};
+    outline-offset: 3px;
   }
 `
 
@@ -79,11 +112,15 @@ export const ClientLink = styled(Link)`
   min-height: 2.75rem;
   display: inline-flex;
   align-items: center;
-  margin-left: auto;
   color: ${({ theme }) => theme.colors.textMuted};
   font-size: 0.85rem;
   font-weight: 800;
   text-decoration: none;
+
+  @media (max-width: 30rem) {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
 
   &:hover {
     color: ${({ theme }) => theme.colors.text};
@@ -95,9 +132,6 @@ export const ClientLink = styled(Link)`
   }
 
   @media (max-width: 40rem) {
-    grid-row: 1;
-    grid-column: 2;
-    margin-left: 0;
     white-space: nowrap;
   }
 `

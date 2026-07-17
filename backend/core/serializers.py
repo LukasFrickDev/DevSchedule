@@ -28,8 +28,9 @@ class CreateAppointmentSerializer(serializers.Serializer):
     customer_phone = serializers.CharField(max_length=20, trim_whitespace=True)
 
     def validate_customer_name(self, value):
-        if not value:
-            raise serializers.ValidationError("Informe o nome.")
+        parts = value.split()
+        if len(parts) < 2 or any(len(part) < 2 for part in parts):
+            raise serializers.ValidationError("Informe seu nome completo, com nome e sobrenome.")
         return value
 
     def validate_customer_phone(self, value):
@@ -87,7 +88,10 @@ class AdminLoginSerializer(serializers.Serializer):
 
 class AdminAppointmentListQuerySerializer(serializers.Serializer):
     date = serializers.DateField(input_formats=["%d-%m-%Y"], required=False)
+    service_id = serializers.UUIDField(required=False)
+    status = serializers.ChoiceField(choices=Appointment.Status.values, required=False)
     page = serializers.IntegerField(min_value=1, required=False, default=1)
+    page_size = serializers.ChoiceField(choices=[10, 25, 50, 100], required=False, default=10)
 
 
 class UpdateAppointmentStatusSerializer(serializers.Serializer):

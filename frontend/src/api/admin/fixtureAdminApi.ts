@@ -1,8 +1,10 @@
 import type {
   AdminAppointmentsResponse,
+  AdminAppointmentsSummary,
   AdminFixtureScenario,
   ApiDate,
   Appointment,
+  AppointmentStatus,
   UpdateAppointmentStatusPayload,
 } from '../../types'
 import {
@@ -38,25 +40,55 @@ function cloneAppointment(appointment: Appointment): Appointment {
   }
 }
 
+function buildSummary(appointments: Appointment[]): AdminAppointmentsSummary {
+  return {
+    total: appointments.length,
+    scheduled: appointments.filter(
+      (appointment) => appointment.status === 'SCHEDULED',
+    ).length,
+    confirmed: appointments.filter(
+      (appointment) => appointment.status === 'CONFIRMED',
+    ).length,
+    completed: appointments.filter(
+      (appointment) => appointment.status === 'COMPLETED',
+    ).length,
+    cancelled: appointments.filter(
+      (appointment) => appointment.status === 'CANCELLED',
+    ).length,
+  }
+}
+
 export type ListAdminAppointmentsParams = {
   date?: ApiDate
   page?: number
+  service_id?: string
+  status?: AppointmentStatus
 }
 
 export const fixtureAdminApi = {
   async listAppointments(
-    { date, page = 1 }: ListAdminAppointmentsParams,
+    { date, page = 1, service_id, status }: ListAdminAppointmentsParams,
     scenario: AdminFixtureScenario,
   ): Promise<AdminAppointmentsResponse> {
     if (scenario === 'loading') return waitForever()
     await wait()
     if (scenario === 'error') throw adminListErrorFixture
     if (scenario === 'empty') {
-      return { count: 0, next: null, previous: null, results: [] }
+      return {
+        count: 0,
+        next: null,
+        previous: null,
+        summary: buildSummary([]),
+        results: [],
+      }
     }
 
     const results = appointments
       .filter((appointment) => !date || appointmentDate(appointment) === date)
+      .filter(
+        (appointment) => !service_id || appointment.service.id === service_id,
+      )
+      .filter((appointment) => !status || appointment.status === status)
       .sort((first, second) =>
         date
           ? first.scheduled_at.localeCompare(second.scheduled_at)
@@ -68,6 +100,7 @@ export const fixtureAdminApi = {
       count: results.length,
       next: null,
       previous: page > 1 ? `/admin/appointments/?page=${page - 1}` : null,
+      summary: buildSummary(results),
       results,
     }
   },

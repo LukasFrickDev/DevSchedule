@@ -7,6 +7,7 @@ import { ReviewStep } from './ReviewStep'
 import { ServiceStep } from './ServiceStep'
 import {
   Brand,
+  BrandLogo,
   Header,
   LiveTitle,
   Main,
@@ -30,7 +31,10 @@ export function SchedulingFlow() {
     <Main>
       <Shell>
         <Header>
-          <Brand>DevSchedule</Brand>
+          <Brand>
+            <BrandLogo src="/logo-devschedule-png.png" alt="" />
+            DevSchedule
+          </Brand>
           <SecureNote>Agendamento simples e seguro</SecureNote>
         </Header>
         <nav aria-label="Progresso do agendamento">
