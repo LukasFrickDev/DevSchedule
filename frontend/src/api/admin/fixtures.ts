@@ -20,6 +20,19 @@ function addDays(referenceDate: Date, amount: number) {
   return date
 }
 
+function isBusinessDay(date: Date) {
+  const day = date.getDay()
+  return day !== 0 && day !== 6
+}
+
+function closestBusinessDay(referenceDate: Date, direction: -1 | 1) {
+  let date = addDays(referenceDate, direction)
+  while (!isBusinessDay(date)) {
+    date = addDays(date, direction)
+  }
+  return date
+}
+
 export function dateToApiDate(date: Date): ApiDate {
   const { year, month, day } = dateParts(date)
   return `${day}-${month}-${year}` as ApiDate
@@ -65,9 +78,26 @@ function buildAppointment(input: FixtureAppointmentInput): Appointment {
 export function buildAdminAppointmentsFixture(
   referenceDate = new Date(),
 ): Appointment[] {
-  const today = addDays(referenceDate, 0)
-  const yesterday = addDays(referenceDate, -1)
-  const tomorrow = addDays(referenceDate, 1)
+  const currentDate = addDays(referenceDate, 0)
+  const previousBusinessDay = closestBusinessDay(currentDate, -1)
+  const nextBusinessDay = closestBusinessDay(currentDate, 1)
+  const fixtureDates = isBusinessDay(currentDate)
+    ? [
+        currentDate,
+        currentDate,
+        currentDate,
+        currentDate,
+        previousBusinessDay,
+        nextBusinessDay,
+      ]
+    : [
+        previousBusinessDay,
+        previousBusinessDay,
+        previousBusinessDay,
+        nextBusinessDay,
+        nextBusinessDay,
+        nextBusinessDay,
+      ]
 
   return [
     buildAppointment({
@@ -76,7 +106,7 @@ export function buildAdminAppointmentsFixture(
       customer_name: 'Ana Lima',
       customer_phone: '11987654321',
       serviceIndex: 0,
-      date: today,
+      date: fixtureDates[0],
       time: '09:00',
       status: 'SCHEDULED',
     }),
@@ -86,7 +116,7 @@ export function buildAdminAppointmentsFixture(
       customer_name: 'Bruno Costa',
       customer_phone: '21988776655',
       serviceIndex: 1,
-      date: today,
+      date: fixtureDates[1],
       time: '10:00',
       status: 'CONFIRMED',
     }),
@@ -96,8 +126,8 @@ export function buildAdminAppointmentsFixture(
       customer_name: 'Camila Rocha',
       customer_phone: '31999887766',
       serviceIndex: 2,
-      date: today,
-      time: '13:30',
+      date: fixtureDates[2],
+      time: '13:00',
       status: 'COMPLETED',
     }),
     buildAppointment({
@@ -106,7 +136,7 @@ export function buildAdminAppointmentsFixture(
       customer_name: 'Diego Martins',
       customer_phone: '41991234567',
       serviceIndex: 0,
-      date: today,
+      date: fixtureDates[3],
       time: '16:00',
       status: 'CANCELLED',
     }),
@@ -116,7 +146,7 @@ export function buildAdminAppointmentsFixture(
       customer_name: 'Elisa Nunes',
       customer_phone: '51995554444',
       serviceIndex: 2,
-      date: yesterday,
+      date: fixtureDates[4],
       time: '14:00',
       status: 'COMPLETED',
     }),
@@ -126,7 +156,7 @@ export function buildAdminAppointmentsFixture(
       customer_name: 'Fábio Alves',
       customer_phone: '61982223333',
       serviceIndex: 1,
-      date: tomorrow,
+      date: fixtureDates[5],
       time: '11:00',
       status: 'SCHEDULED',
     }),

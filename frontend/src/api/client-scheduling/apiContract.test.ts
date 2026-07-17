@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { ApiErrorCode } from '../../types'
 import { fixtureSchedulingApi } from './fixtureSchedulingApi'
 import {
-  addMinutesToTime,
+  availabilityStarts,
   availabilityErrorFixture,
   buildAppointmentResponseFixture,
   conflictErrorFixture,
@@ -33,6 +33,7 @@ describe('contrato externo e fixtures da API', () => {
   })
 
   it('mantém os serviços em ordem alfabética com as durações aprovadas', () => {
+    expect(servicesResponseFixture.data).toHaveLength(3)
     expect(servicesResponseFixture.data).toEqual([
       {
         id: '81ef3676-5987-441c-af89-6e9ad30b6014',
@@ -46,16 +47,21 @@ describe('contrato externo e fixtures da API', () => {
         name: 'Orientação de carreira',
         description:
           'Conversa focada em currículo, portfólio, posicionamento profissional e próximos passos.',
-        duration_minutes: 30,
+        duration_minutes: 60,
       },
       {
         id: '0f52181c-c086-42e0-89ea-a931e34b82ca',
         name: 'Revisão de projeto',
         description:
           'Análise de código, estrutura e boas práticas com feedback objetivo para evolução do projeto.',
-        duration_minutes: 45,
+        duration_minutes: 60,
       },
     ])
+    expect(
+      servicesResponseFixture.data.every(
+        (service) => service.duration_minutes === 60,
+      ),
+    ).toBe(true)
   })
 
   it('aceita somente os códigos de erro aprovados', () => {
@@ -119,12 +125,33 @@ describe('contrato externo e fixtures da API', () => {
 })
 
 describe('regras do gateway de disponibilidade', () => {
-  it.each([
-    [30, '09:30'],
-    [45, '09:45'],
-    [60, '10:00'],
-  ])('calcula o final para %i minutos', (duration, expectedEnd) => {
-    expect(addMinutesToTime('09:00', duration)).toBe(expectedEnd)
+  it('gera somente horas cheias com término uma hora após o início', async () => {
+    expect(availabilityStarts).toHaveLength(9)
+    expect(availabilityStarts.every((start) => /^\d{2}:00$/.test(start))).toBe(
+      true,
+    )
+
+    for (const service of servicesResponseFixture.data) {
+      const availability = await fixtureSchedulingApi.getAvailability(
+        service.id,
+        '20-07-2026',
+        'default',
+      )
+
+      expect(availability.slots.map((slot) => slot.start)).toEqual(
+        availabilityStarts,
+      )
+      for (const slot of availability.slots) {
+        const expectedEndHour = String(Number(slot.start.slice(0, 2)) + 1)
+          .padStart(2, '0')
+          .concat(':00')
+        expect(slot.end).toBe(expectedEndHour)
+      }
+      expect(availability.slots.at(-1)).toMatchObject({
+        start: '17:00',
+        end: '18:00',
+      })
+    }
   })
 
   it('devolve slots vazios no sábado e domingo', async () => {

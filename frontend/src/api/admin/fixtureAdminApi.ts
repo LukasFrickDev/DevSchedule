@@ -58,7 +58,9 @@ export const fixtureAdminApi = {
     const results = appointments
       .filter((appointment) => !date || appointmentDate(appointment) === date)
       .sort((first, second) =>
-        first.scheduled_at.localeCompare(second.scheduled_at),
+        date
+          ? first.scheduled_at.localeCompare(second.scheduled_at)
+          : second.scheduled_at.localeCompare(first.scheduled_at),
       )
       .map(cloneAppointment)
 
@@ -103,8 +105,8 @@ export const fixtureAdminApi = {
   },
 }
 
-export function resetAdminAppointmentsFixture() {
-  appointments = buildAdminAppointmentsFixture()
+export function resetAdminAppointmentsFixture(referenceDate = new Date()) {
+  appointments = buildAdminAppointmentsFixture(referenceDate)
 }
 
 export function getAdminFixtureScenario(): AdminFixtureScenario {

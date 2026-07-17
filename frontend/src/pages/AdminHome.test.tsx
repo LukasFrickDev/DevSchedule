@@ -39,6 +39,11 @@ async function login() {
   await screen.findByRole('heading', { name: /agenda administrativa/i })
 }
 
+async function showAllAppointments() {
+  fireEvent.click(screen.getByRole('button', { name: /limpar filtro/i }))
+  await screen.findByText('Ana Lima')
+}
+
 function rowFor(customerName: string) {
   return screen.getByText(customerName).closest('tr') as HTMLTableRowElement
 }
@@ -66,8 +71,9 @@ describe('AdminHome', () => {
     expect(screen.getByText('admin')).toBeInTheDocument()
     expect(screen.getByText('devschedule')).toBeInTheDocument()
     await login()
+    await showAllAppointments()
 
-    expect(await screen.findByText('Ana Lima')).toBeInTheDocument()
+    expect(screen.getByText('Ana Lima')).toBeInTheDocument()
     const row = rowFor('Ana Lima')
     expect(within(row).getByText('(11) 98765-4321')).toBeInTheDocument()
     expect(within(row).getByText('Mentoria individual')).toBeInTheDocument()
@@ -102,7 +108,7 @@ describe('AdminHome', () => {
   it('altera o status sem confirmação quando não é cancelamento', async () => {
     renderAdminHome()
     await login()
-    await screen.findByText('Ana Lima')
+    await showAllAppointments()
 
     await chooseStatus('Ana Lima', 'CONFIRMED')
 
@@ -117,7 +123,7 @@ describe('AdminHome', () => {
   it('cancela após confirmação e preserva o registro', async () => {
     renderAdminHome()
     await login()
-    await screen.findByText('Ana Lima')
+    await showAllAppointments()
 
     await chooseStatus('Ana Lima', 'CANCELLED')
     expect(screen.getByRole('dialog')).toHaveTextContent(
@@ -139,7 +145,7 @@ describe('AdminHome', () => {
   it('exclui permanentemente após confirmação', async () => {
     renderAdminHome()
     await login()
-    await screen.findByText('Ana Lima')
+    await showAllAppointments()
 
     fireEvent.click(
       screen.getByRole('button', {
@@ -164,7 +170,7 @@ describe('AdminHome', () => {
   it('mostra erro de status e mantém o registro', async () => {
     renderAdminHome('status-error')
     await login()
-    await screen.findByText('Ana Lima')
+    await showAllAppointments()
 
     await chooseStatus('Ana Lima', 'CONFIRMED')
 
@@ -177,7 +183,7 @@ describe('AdminHome', () => {
   it('mostra erro de exclusão e mantém o diálogo e o registro', async () => {
     renderAdminHome('delete-error')
     await login()
-    await screen.findByText('Ana Lima')
+    await showAllAppointments()
     fireEvent.click(
       screen.getByRole('button', {
         name: /excluir agendamento de ana lima/i,
@@ -197,7 +203,7 @@ describe('AdminHome', () => {
   it('fecha o diálogo com Escape quando não há operação em andamento', async () => {
     renderAdminHome()
     await login()
-    await screen.findByText('Ana Lima')
+    await showAllAppointments()
     await chooseStatus('Ana Lima', 'CANCELLED')
 
     fireEvent.keyDown(document, { key: 'Escape' })
