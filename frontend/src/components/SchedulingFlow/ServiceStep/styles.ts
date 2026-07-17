@@ -55,6 +55,7 @@ export const ServiceDescription = styled.span`
   margin-top: ${({ theme }) => theme.spacing.md};
   color: ${({ theme }) => theme.colors.textMuted};
   line-height: 1.5;
+  font-family: ${({ theme }) => theme.fonts.body}
 `
 
 export const SelectionText = styled.span`
