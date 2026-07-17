@@ -159,8 +159,8 @@ export const FilterBar = styled.div`
     grid-template-columns: repeat(2, minmax(0, 1fr));
 
     > button {
-      grid-column: 1 / -1;
-      justify-self: end;
+      grid-column: 2;
+      justify-self: stretch;
     }
   }
 
