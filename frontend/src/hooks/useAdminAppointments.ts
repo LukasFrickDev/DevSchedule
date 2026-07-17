@@ -1,12 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { fixtureAdminApi } from '../api/admin/fixtureAdminApi'
-import type {
-  AdminFixtureScenario,
-  ApiError,
-  Appointment,
-  AppointmentStatus,
-} from '../types'
+import { adminApi, isApiError } from '../api/admin/adminApi'
+import type { Appointment, AppointmentStatus } from '../types'
 import { inputDateToApiDate, todayAsInputDate } from '../utils/date'
 
 type Feedback = {
@@ -16,25 +11,17 @@ type Feedback = {
 
 type PendingAction = {
   appointmentId: string
-  kind: 'status' | 'delete'
+  kind: 'status' | 'cancel' | 'delete'
 } | null
-
-function isApiError(value: unknown): value is ApiError {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'error' in value &&
-    typeof value.error === 'object' &&
-    value.error !== null &&
-    'message' in value.error
-  )
-}
 
 function readableError(error: unknown, fallback: string) {
   return isApiError(error) ? error.error.message : fallback
 }
 
-export function useAdminAppointments(scenario: AdminFixtureScenario) {
+export function useAdminAppointments(
+  token: string,
+  onAuthenticationFailed: () => void,
+) {
   const [selectedDate, setSelectedDate] = useState(todayAsInputDate)
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
@@ -48,8 +35,8 @@ export function useAdminAppointments(scenario: AdminFixtureScenario) {
     let active = true
     const apiDate = selectedDate ? inputDateToApiDate(selectedDate) : null
 
-    fixtureAdminApi
-      .listAppointments({ date: apiDate ?? undefined, page: 1 }, scenario)
+    adminApi
+      .listAppointments(token, apiDate ?? undefined)
       .then((response) => {
         if (!active) return
         setAppointments(response.results)
@@ -58,6 +45,10 @@ export function useAdminAppointments(scenario: AdminFixtureScenario) {
       })
       .catch((error: unknown) => {
         if (!active) return
+        if (isApiError(error) && error.error.code === 'authentication_failed') {
+          onAuthenticationFailed()
+          return
+        }
         setAppointments([])
         setLoadError(
           readableError(error, 'Não foi possível carregar os agendamentos.'),
@@ -68,7 +59,7 @@ export function useAdminAppointments(scenario: AdminFixtureScenario) {
     return () => {
       active = false
     }
-  }, [requestVersion, scenario, selectedDate])
+  }, [onAuthenticationFailed, requestVersion, selectedDate, token])
 
   const indicators = useMemo(
     () => ({
@@ -113,16 +104,9 @@ export function useAdminAppointments(scenario: AdminFixtureScenario) {
     setPendingAction({ appointmentId: id, kind: 'status' })
     setFeedback(null)
     try {
-      const updated = await fixtureAdminApi.updateAppointmentStatus(
-        id,
-        { status },
-        scenario,
-      )
-      setAppointments((current) =>
-        current.map((appointment) =>
-          appointment.id === updated.id ? updated : appointment,
-        ),
-      )
+      await adminApi.updateAppointmentStatus(token, id, status)
+      setLoading(true)
+      setRequestVersion((version) => version + 1)
       setFeedback({
         type: 'success',
         message:
@@ -132,9 +116,44 @@ export function useAdminAppointments(scenario: AdminFixtureScenario) {
       })
       return true
     } catch (error: unknown) {
+      if (isApiError(error) && error.error.code === 'authentication_failed') {
+        onAuthenticationFailed()
+        return false
+      }
       setFeedback({
         type: 'error',
         message: readableError(error, 'Não foi possível alterar o status.'),
+      })
+      return false
+    } finally {
+      pendingRef.current = false
+      setPendingAction(null)
+    }
+  }
+
+  async function cancelAppointment(id: string) {
+    if (pendingRef.current) return false
+
+    pendingRef.current = true
+    setPendingAction({ appointmentId: id, kind: 'cancel' })
+    setFeedback(null)
+    try {
+      await adminApi.cancelAppointment(token, id)
+      setLoading(true)
+      setRequestVersion((version) => version + 1)
+      setFeedback({
+        type: 'success',
+        message: 'Agendamento cancelado. O registro foi preservado.',
+      })
+      return true
+    } catch (error: unknown) {
+      if (isApiError(error) && error.error.code === 'authentication_failed') {
+        onAuthenticationFailed()
+        return false
+      }
+      setFeedback({
+        type: 'error',
+        message: readableError(error, 'Não foi possível cancelar o agendamento.'),
       })
       return false
     } finally {
@@ -150,16 +169,19 @@ export function useAdminAppointments(scenario: AdminFixtureScenario) {
     setPendingAction({ appointmentId: id, kind: 'delete' })
     setFeedback(null)
     try {
-      await fixtureAdminApi.deleteAppointment(id, scenario)
-      setAppointments((current) =>
-        current.filter((appointment) => appointment.id !== id),
-      )
+      await adminApi.deleteAppointment(token, id)
+      setLoading(true)
+      setRequestVersion((version) => version + 1)
       setFeedback({
         type: 'success',
         message: 'Agendamento excluído permanentemente.',
       })
       return true
     } catch (error: unknown) {
+      if (isApiError(error) && error.error.code === 'authentication_failed') {
+        onAuthenticationFailed()
+        return false
+      }
       setFeedback({
         type: 'error',
         message: readableError(error, 'Não foi possível excluir o registro.'),
@@ -183,6 +205,7 @@ export function useAdminAppointments(scenario: AdminFixtureScenario) {
     clearDateFilter,
     retry,
     updateStatus,
+    cancelAppointment,
     deleteAppointment,
     dismissFeedback: () => setFeedback(null),
   }
