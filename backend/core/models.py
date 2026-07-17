@@ -39,5 +39,14 @@ class Appointment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["service", "date", "start"],
+                condition=~models.Q(status="CANCELLED"),
+                name="unique_active_appointment_slot",
+            )
+        ]
+
     def __str__(self) -> str:
         return f"{self.confirmation_code} - {self.customer_name}"
