@@ -9,8 +9,7 @@ export const GlobalStyles = createGlobalStyle`
 
   html {
     color-scheme: dark;
-    font-family: Inter, Albert Sans, system-ui, -apple-system, BlinkMacSystemFont,
-      "Segoe UI", sans-serif;
+    font-family: ${({ theme }) => theme.fonts.body};
     background: ${({ theme }) => theme.colors.background};
   }
 
@@ -26,11 +25,25 @@ export const GlobalStyles = createGlobalStyle`
     text-rendering: optimizeLegibility;
   }
 
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: ${({ theme }) => theme.fonts.display};
+    font-weight: 400;
+  }
+
   button,
   input,
   select,
   textarea {
     font: inherit;
+  }
+
+  button {
+    font-family: ${({ theme }) => theme.fonts.display};
   }
 
   ::selection {

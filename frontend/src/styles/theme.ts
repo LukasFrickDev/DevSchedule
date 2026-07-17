@@ -1,4 +1,8 @@
 export const theme = {
+  fonts: {
+    body: '"Albert Sans Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    display: 'Aldrich, "Albert Sans Variable", sans-serif',
+  },
   colors: {
     background: '#111012',
     surface: '#181719',

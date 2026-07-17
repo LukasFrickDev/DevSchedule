@@ -17,6 +17,7 @@ backend/.pytest_cache/
 backend/.ruff_cache/
 backend/htmlcov/
 backend/.coverage
+backend/staticfiles/
 
 # Local infrastructure
 /.env
