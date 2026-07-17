@@ -1,22 +1,13 @@
-import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 
-type PageShellProps = {
-  eyebrow: string
-  title: string
-  description: string
-  actionLabel: string
-  actionTo: string
-}
-
-const Main = styled.main`
+export const Main = styled.main`
   min-height: 100vh;
   display: grid;
   place-items: center;
   padding: ${({ theme }) => theme.spacing.xl};
 `
 
-const Card = styled.section`
+export const Card = styled.section`
   width: min(100%, 48rem);
   padding: clamp(2rem, 6vw, 4.5rem);
   border: 1px solid ${({ theme }) => theme.colors.border};
@@ -24,14 +15,18 @@ const Card = styled.section`
   background:
     radial-gradient(
       circle at top right,
-      rgb(133 50 242 / 18%),
+      color-mix(
+        in srgb,
+        ${({ theme }) => theme.colors.secondary} 18%,
+        transparent
+      ),
       transparent 36%
     ),
     ${({ theme }) => theme.colors.surface};
   box-shadow: ${({ theme }) => theme.shadows.panel};
 `
 
-const Eyebrow = styled.p`
+export const Eyebrow = styled.p`
   margin: 0 0 ${({ theme }) => theme.spacing.md};
   color: ${({ theme }) => theme.colors.primary};
   font-size: 0.75rem;
@@ -40,7 +35,7 @@ const Eyebrow = styled.p`
   text-transform: uppercase;
 `
 
-const Title = styled.h1`
+export const Title = styled.h1`
   max-width: 13ch;
   margin: 0;
   font-size: clamp(2.25rem, 8vw, 4.75rem);
@@ -48,7 +43,7 @@ const Title = styled.h1`
   letter-spacing: -0.045em;
 `
 
-const Description = styled.p`
+export const Description = styled.p`
   max-width: 58ch;
   margin: ${({ theme }) => theme.spacing.lg} 0
     ${({ theme }) => theme.spacing.xl};
@@ -56,7 +51,7 @@ const Description = styled.p`
   font-size: clamp(1rem, 2vw, 1.125rem);
 `
 
-const Action = styled(Link)`
+export const Action = styled.a`
   display: inline-flex;
   min-height: 3rem;
   align-items: center;
@@ -73,7 +68,12 @@ const Action = styled(Link)`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgb(57 211 83 / 24%);
+    box-shadow: 0 12px 32px
+      color-mix(
+        in srgb,
+        ${({ theme }) => theme.colors.primary} 24%,
+        transparent
+      );
   }
 
   &:focus-visible {
@@ -81,22 +81,3 @@ const Action = styled(Link)`
     outline-offset: 4px;
   }
 `
-
-export function PageShell({
-  eyebrow,
-  title,
-  description,
-  actionLabel,
-  actionTo,
-}: PageShellProps) {
-  return (
-    <Main>
-      <Card>
-        <Eyebrow>{eyebrow}</Eyebrow>
-        <Title>{title}</Title>
-        <Description>{description}</Description>
-        <Action to={actionTo}>{actionLabel}</Action>
-      </Card>
-    </Main>
-  )
-}

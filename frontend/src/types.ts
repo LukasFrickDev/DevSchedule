@@ -82,3 +82,17 @@ export type AvailabilityConflict = {
   date: ApiDate
   start: ApiTime
 }
+
+export type AdminAppointmentsResponse = {
+  count: number
+  next: string | null
+  previous: string | null
+  results: Appointment[]
+}
+
+export type UpdateAppointmentStatusPayload = {
+  status: AppointmentStatus
+}
+
+export type AdminFixtureScenario =
+  'default' | 'loading' | 'error' | 'empty' | 'status-error' | 'delete-error'

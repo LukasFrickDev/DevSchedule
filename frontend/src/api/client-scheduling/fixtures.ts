@@ -22,14 +22,14 @@ export const servicesResponseFixture = {
       name: 'Orientação de carreira',
       description:
         'Conversa focada em currículo, portfólio, posicionamento profissional e próximos passos.',
-      duration_minutes: 30,
+      duration_minutes: 60,
     },
     {
       id: '0f52181c-c086-42e0-89ea-a931e34b82ca',
       name: 'Revisão de projeto',
       description:
         'Análise de código, estrutura e boas práticas com feedback objetivo para evolução do projeto.',
-      duration_minutes: 45,
+      duration_minutes: 60,
     },
   ],
 } satisfies { data: Service[] }
@@ -69,21 +69,15 @@ export const availabilityStarts = [
 
 const unavailableStarts = new Set<ApiTime>(['10:00', '12:00', '15:00'])
 
-export function addMinutesToTime(
-  start: ApiTime,
-  duration_minutes: number,
-): ApiTime {
-  const [hours, minutes] = start.split(':').map(Number)
-  const total = hours * 60 + minutes + duration_minutes
-  const endHours = String(Math.floor(total / 60)).padStart(2, '0')
-  const endMinutes = String(total % 60).padStart(2, '0')
-  return `${endHours}:${endMinutes}` as ApiTime
+export function addOneHourToTime(start: ApiTime): ApiTime {
+  const [hours] = start.split(':').map(Number)
+  const endHours = String(hours + 1).padStart(2, '0')
+  return `${endHours}:00` as ApiTime
 }
 
 export function buildAvailabilityResponseFixture(
   service_id: string,
   date: ApiDate,
-  duration_minutes: number,
   empty = false,
 ): { data: Availability } {
   return {
@@ -95,7 +89,7 @@ export function buildAvailabilityResponseFixture(
         ? []
         : availabilityStarts.map((start) => ({
             start,
-            end: addMinutesToTime(start, duration_minutes),
+            end: addOneHourToTime(start),
             available: !unavailableStarts.has(start),
           })),
     },

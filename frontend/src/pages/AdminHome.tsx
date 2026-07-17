@@ -1,13 +1,5 @@
-import { PageShell } from '../components/PageShell'
+import { AdminFlow } from '../components/AdminFlow'
 
 export function AdminHome() {
-  return (
-    <PageShell
-      eyebrow="Área administrativa"
-      title="Operação clara, agenda organizada."
-      description="Este shell será evoluído para login, indicadores, filtro por data e gerenciamento dos atendimentos."
-      actionLabel="Voltar para a área do cliente"
-      actionTo="/"
-    />
-  )
+  return <AdminFlow />
 }

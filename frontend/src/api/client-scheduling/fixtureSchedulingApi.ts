@@ -75,12 +75,7 @@ export const fixtureSchedulingApi = {
     }
 
     const empty = scenario === 'availability-empty' || isWeekend(date)
-    return buildAvailabilityResponseFixture(
-      service_id,
-      date,
-      service.duration_minutes,
-      empty,
-    ).data
+    return buildAvailabilityResponseFixture(service_id, date, empty).data
   },
 
   async createAppointment(

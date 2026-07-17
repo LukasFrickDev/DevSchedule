@@ -199,7 +199,7 @@ describe('ClientHome', () => {
       service: {
         id: 'c149960b-55b9-4847-b197-79bc24131219',
         name: 'Serviço devolvido pela API',
-        duration_minutes: 30,
+        duration_minutes: 60,
       },
       scheduled_at: '2026-08-20T14:00:00-03:00',
       status: 'SCHEDULED',
