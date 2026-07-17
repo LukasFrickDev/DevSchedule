@@ -174,11 +174,22 @@ export const StateBox = styled.div<{ $danger?: boolean }>`
   p {
     margin: ${({ theme }) => theme.spacing.sm} 0;
   }
+
+  > div {
+    display: grid;
+    place-items: center;
+    gap: ${({ theme }) => theme.spacing.md};
+  }
+
+  > div p {
+    margin: 0;
+  }
 `
 
 export const Loader = styled.span`
   width: 2rem;
   height: 2rem;
+  display: inline-block;
   border: 3px solid ${({ theme }) => theme.colors.border};
   border-top-color: ${({ theme }) => theme.colors.primary};
   border-radius: 50%;

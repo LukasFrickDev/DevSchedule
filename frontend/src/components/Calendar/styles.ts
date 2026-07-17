@@ -101,10 +101,6 @@ export const MonthButton = styled.button`
   color: ${({ theme }) => theme.colors.text};
   cursor: pointer;
 
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.secondary};
-    background: rgb(133 50 242 / 14%);
-  }
 `
 
 export const CalendarGrid = styled.div`
