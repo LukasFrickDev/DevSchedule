@@ -167,7 +167,8 @@ export const FilterBar = styled.div`
   @media (max-width: 30rem) {
     grid-template-columns: 1fr;
 
-    button {
+    > button {
+      grid-column: 1 / -1;
       width: 100%;
     }
   }
@@ -225,10 +226,6 @@ export const ClearButton = styled.button`
   &:disabled {
     cursor: not-allowed;
     opacity: 0.45;
-  }
-
-  @media (max-width: 30rem) {
-    width: 100%;
   }
 `
 
