@@ -6,6 +6,7 @@
 frontend/node_modules/
 frontend/dist/
 frontend/.env
+frontend/.env.local
 frontend/coverage/
 
 # Backend
@@ -21,4 +22,6 @@ backend/staticfiles/
 
 # Local infrastructure
 /.env
+/.pytest_cache/
+/.ruff_cache/
 postgres_data/

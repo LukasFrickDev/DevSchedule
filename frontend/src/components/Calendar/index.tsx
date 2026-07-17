@@ -109,17 +109,21 @@ export function Calendar({
   const calendarId = `${id}-calendar`
 
   useEffect(() => {
-    setTypedValue(value ? formatInputDate(value) : '')
-    const nextSelectedDate = dateFromInput(value)
-    if (nextSelectedDate) {
-      setVisibleMonth(
-        new Date(
-          nextSelectedDate.getFullYear(),
-          nextSelectedDate.getMonth(),
-          1,
-        ),
-      )
-    }
+    const frame = window.requestAnimationFrame(() => {
+      setTypedValue(value ? formatInputDate(value) : '')
+      const nextSelectedDate = dateFromInput(value)
+      if (nextSelectedDate) {
+        setVisibleMonth(
+          new Date(
+            nextSelectedDate.getFullYear(),
+            nextSelectedDate.getMonth(),
+            1,
+          ),
+        )
+      }
+    })
+
+    return () => window.cancelAnimationFrame(frame)
   }, [value])
 
   useEffect(() => {

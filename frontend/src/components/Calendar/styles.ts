@@ -25,8 +25,6 @@ export const DateInputRow = styled.div`
     outline: 3px solid rgb(133 50 242 / 55%);
     outline-offset: 2px;
   }
-
-
 `
 
 export const DateInput = styled.input`
@@ -37,6 +35,10 @@ export const DateInput = styled.input`
   outline: 0;
   background: transparent;
   color: ${({ theme }) => theme.colors.text};
+
+  &:focus-visible {
+    outline: none;
+  }
 `
 
 export const ToggleButton = styled.button`
@@ -51,6 +53,10 @@ export const ToggleButton = styled.button`
   background: transparent;
   color: ${({ theme }) => theme.colors.primary};
   cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+  }
 
   &:hover:not(:disabled) {
     background: rgb(57 211 83 / 10%);
@@ -101,6 +107,10 @@ export const MonthButton = styled.button`
   color: ${({ theme }) => theme.colors.text};
   cursor: pointer;
 
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.secondary};
+    background: rgb(133 50 242 / 14%);
+  }
 `
 
 export const CalendarGrid = styled.div`
@@ -148,4 +158,3 @@ export const DayButton = styled.button<{ $selected: boolean; $today: boolean }>`
     text-decoration: line-through;
   }
 `
-

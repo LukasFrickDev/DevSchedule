@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from 'react'
 
 import {
-  DemoCredentials,
+
   ErrorMessage,
   Field,
   Form,
@@ -91,15 +91,6 @@ export function AdminLogin({ onSubmit }: AdminLoginProps) {
           {submitting ? 'Entrando…' : 'Entrar no painel'}
         </SubmitButton>
       </Form>
-      <DemoCredentials>
-        <strong>Credenciais de demonstração</strong>
-        <span>
-          Usuário: <code>admin</code>
-        </span>
-        <span>
-          Senha: <code>devschedule</code>
-        </span>
-      </DemoCredentials>
     </LoginCard>
   )
 }

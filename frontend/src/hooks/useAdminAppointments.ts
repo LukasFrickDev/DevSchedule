@@ -75,9 +75,6 @@ export function useAdminAppointments(
     const apiDate = selectedDate ? inputDateToApiDate(selectedDate) : null
     const appending = page > 1
 
-    if (appending) setLoadingMore(true)
-    else setLoading(true)
-
     adminApi
       .listAppointments(
         token,
@@ -186,6 +183,7 @@ export function useAdminAppointments(
 
   function loadMore() {
     if (!hasMore || loadingMore) return
+    setLoadingMore(true)
     setPage((current) => current + 1)
   }
 
