@@ -200,6 +200,13 @@ export const FilterField = styled.div`
       padding: 0 ${({ theme }) => theme.spacing.md};
     }
   }
+
+  @media (hover: none) and (pointer: coarse) {
+    select {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+  }
 `
 
 export const ClearButton = styled.button`
@@ -226,6 +233,11 @@ export const ClearButton = styled.button`
   &:disabled {
     cursor: not-allowed;
     opacity: 0.45;
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    -webkit-appearance: none;
+    appearance: none;
   }
 `
 
@@ -261,6 +273,11 @@ export const PageSizeSelect = styled.select`
   color: ${({ theme }) => theme.colors.text};
   font-size: 0.78rem;
   font-weight: 800;
+
+  @media (hover: none) and (pointer: coarse) {
+    -webkit-appearance: none;
+    appearance: none;
+  }
 `
 
 export const LoadMoreButton = styled.button`
