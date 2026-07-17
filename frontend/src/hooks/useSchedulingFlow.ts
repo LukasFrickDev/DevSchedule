@@ -1,17 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 
-import {
-  fixtureSchedulingApi,
-  getFixtureScenario,
-  isApiError,
-} from '../api/client-scheduling/fixtureSchedulingApi'
+import { isApiError, schedulingApi } from '../api/client-scheduling/schedulingApi'
 import type {
   ApiTime,
   Appointment,
   Availability,
   AvailabilityConflict,
   AvailabilitySlot,
-  FixtureScenario,
   FlowStep,
   Service,
 } from '../types'
@@ -50,7 +45,6 @@ function readableError(error: unknown, fallback: string) {
 }
 
 export function useSchedulingFlow() {
-  const [scenario] = useState<FixtureScenario>(() => getFixtureScenario())
   const [step, setStep] = useState<FlowStep>('service')
   const [services, setServices] = useState<AsyncState<Service[]>>({
     status: 'loading',
@@ -81,8 +75,8 @@ export function useSchedulingFlow() {
 
   useEffect(() => {
     let active = true
-    fixtureSchedulingApi
-      .listServices(scenario)
+    schedulingApi
+      .listServices()
       .then((data) => {
         if (active) setServices({ status: 'success', data })
       })
@@ -101,7 +95,7 @@ export function useSchedulingFlow() {
     return () => {
       active = false
     }
-  }, [scenario, servicesRequest])
+  }, [servicesRequest])
 
   useEffect(() => {
     if (!selectedService || !apiDate || !isValidFutureOrToday(inputDate)) {
@@ -109,8 +103,8 @@ export function useSchedulingFlow() {
     }
 
     let active = true
-    fixtureSchedulingApi
-      .getAvailability(selectedService.id, apiDate, scenario)
+    schedulingApi
+      .getAvailability(selectedService.id, apiDate)
       .then((data) => {
         if (active) setAvailability({ status: 'success', data })
       })
@@ -129,7 +123,7 @@ export function useSchedulingFlow() {
     return () => {
       active = false
     }
-  }, [apiDate, availabilityRequest, inputDate, scenario, selectedService])
+  }, [apiDate, availabilityRequest, inputDate, selectedService])
 
   function chooseService(service: Service) {
     if (service.id !== selectedService?.id) {
@@ -209,7 +203,7 @@ export function useSchedulingFlow() {
     submittingRef.current = true
     setSubmitting(true)
     try {
-      const created = await fixtureSchedulingApi.createAppointment(
+      const created = await schedulingApi.createAppointment(
         {
           service_id: selectedService.id,
           date: apiDate,
@@ -217,7 +211,6 @@ export function useSchedulingFlow() {
           customer_name: name.trim(),
           customer_phone: phone.replace(/\D/g, ''),
         },
-        scenario,
       )
       setAppointment(created)
       setStep('success')
