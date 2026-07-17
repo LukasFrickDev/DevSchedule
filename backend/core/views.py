@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import AllowAny
@@ -114,6 +115,8 @@ def availability(request):
             }
         )
 
+    current_time = timezone.localtime().time()
+    is_today = selected_date == timezone.localdate()
     occupied_starts = set(
         Appointment.objects.filter(date=selected_date)
         .exclude(status=Appointment.Status.CANCELLED)
@@ -123,7 +126,8 @@ def availability(request):
         {
             "start": start.strftime("%H:%M"),
             "end": slot_end(start).strftime("%H:%M"),
-            "available": start not in occupied_starts,
+            "available": start not in occupied_starts
+            and not (is_today and start <= current_time),
         }
         for start in SCHEDULING_STARTS
     ]

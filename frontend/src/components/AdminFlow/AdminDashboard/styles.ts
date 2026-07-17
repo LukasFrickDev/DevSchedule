@@ -193,22 +193,42 @@ export const FilterField = styled.div`
     background: ${({ theme }) => theme.colors.surfaceRaised};
     color: ${({ theme }) => theme.colors.text};
   }
+
+  @media (max-width: 30rem) {
+    select {
+      padding: 0 ${({ theme }) => theme.spacing.md};
+    }
+  }
 `
 
 export const ClearButton = styled.button`
   min-height: 3.25rem;
   align-self: end;
   padding: 0 ${({ theme }) => theme.spacing.md};
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  background: transparent;
-  color: ${({ theme }) => theme.colors.text};
-  font-weight: 800;
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.onPrimary};
+  font-weight: 900;
   white-space: nowrap;
   cursor: pointer;
+
+  &:focus-visible {
+    outline: 3px solid ${({ theme }) => theme.colors.secondary};
+    outline-offset: 3px;
+  }
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.05);
+  }
 
   &:disabled {
     cursor: not-allowed;
     opacity: 0.45;
+  }
+
+  @media (max-width: 30rem) {
+    width: 100%;
   }
 `
 

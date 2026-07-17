@@ -33,6 +33,10 @@ export const Header = styled.header`
     gap: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
     margin-bottom: ${({ theme }) => theme.spacing.xl};
   }
+
+  @media (max-width: 30rem) {
+    margin-bottom: ${({ theme }) => theme.spacing.lg};
+  }
 `
 
 export const Brand = styled.span`
@@ -66,6 +70,10 @@ export const AdminBadge = styled.span`
     grid-column: 1;
     justify-self: start;
   }
+
+  @media (max-width: 30rem) {
+    display: none;
+  }
 `
 
 export const HeaderActions = styled.div`
@@ -96,6 +104,9 @@ export const LogoutButton = styled.button`
 
   @media (max-width: 30rem) {
     flex: 1 1 auto;
+    min-height: 2.25rem;
+    padding: 0 ${({ theme }) => theme.spacing.xs};
+    font-size: 0.72rem;
   }
 
   &:hover {
@@ -120,6 +131,9 @@ export const ClientLink = styled(Link)`
   @media (max-width: 30rem) {
     flex: 1 1 auto;
     justify-content: center;
+    min-height: 2.25rem;
+    padding: 0 ${({ theme }) => theme.spacing.xs};
+    font-size: 0.72rem;
   }
 
   &:hover {

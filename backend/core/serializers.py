@@ -19,6 +19,13 @@ class AvailabilityQuerySerializer(serializers.Serializer):
     service_id = serializers.UUIDField()
     date = serializers.DateField(input_formats=["%d-%m-%Y"])
 
+    def validate_date(self, value):
+        if value < timezone.localdate():
+            raise serializers.ValidationError(
+                "Escolha uma data igual ou posterior a hoje."
+            )
+        return value
+
 
 class CreateAppointmentSerializer(serializers.Serializer):
     service_id = serializers.UUIDField()
@@ -40,6 +47,10 @@ class CreateAppointmentSerializer(serializers.Serializer):
         return phone
 
     def validate_date(self, value):
+        if value < timezone.localdate():
+            raise serializers.ValidationError(
+                "Escolha uma data igual ou posterior a hoje."
+            )
         if value.weekday() >= 5:
             raise serializers.ValidationError(
                 "Atendimentos ocorrem somente de segunda a sexta-feira."
@@ -50,6 +61,16 @@ class CreateAppointmentSerializer(serializers.Serializer):
         if value not in SCHEDULING_STARTS:
             raise serializers.ValidationError("Escolha um horário entre 09:00 e 17:00.")
         return value
+
+    def validate(self, attrs):
+        if (
+            attrs["date"] == timezone.localdate()
+            and attrs["time"] <= timezone.localtime().time()
+        ):
+            raise serializers.ValidationError(
+                {"time": "Escolha um horário posterior ao horário atual."}
+            )
+        return attrs
 
 
 class AppointmentServiceSerializer(serializers.ModelSerializer):
