@@ -93,6 +93,36 @@ export const Input = styled.input`
   }
 `
 
+export const PasswordInputWrapper = styled.div`
+  position: relative;
+`
+
+export const PasswordInput = styled(Input)`
+  padding-right: 3.5rem;
+`
+
+export const PasswordToggle = styled.button`
+  position: absolute;
+  top: 50%;
+  right: ${({ theme }) => theme.spacing.sm};
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: transparent;
+  color: ${({ theme }) => theme.colors.textMuted};
+  cursor: pointer;
+  transform: translateY(-50%);
+
+  &:hover {
+    background: rgb(133 50 242 / 14%);
+    color: ${({ theme }) => theme.colors.text};
+  }
+`
+
 export const ErrorMessage = styled.p`
   margin: 0;
   color: ${({ theme }) => theme.colors.danger};

@@ -1,13 +1,16 @@
 import { type FormEvent, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 
 import {
-
   ErrorMessage,
   Field,
   Form,
   Input,
   LoginCard,
   LoginHeader,
+  PasswordInput,
+  PasswordInputWrapper,
+  PasswordToggle,
   SubmitButton,
 } from './styles'
 
@@ -18,6 +21,7 @@ type AdminLoginProps = {
 export function AdminLogin({ onSubmit }: AdminLoginProps) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState<{
     username?: string
     password?: string
@@ -70,16 +74,30 @@ export function AdminLogin({ onSubmit }: AdminLoginProps) {
         </Field>
         <Field>
           <label htmlFor="admin-password">Senha</label>
-          <Input
-            id="admin-password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            aria-invalid={Boolean(errors.password || errors.credentials)}
-            aria-describedby={errors.password ? 'password-error' : undefined}
-            onChange={(event) => setPassword(event.target.value)}
-          />
+          <PasswordInputWrapper>
+            <PasswordInput
+              id="admin-password"
+              name="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              value={password}
+              aria-invalid={Boolean(errors.password || errors.credentials)}
+              aria-describedby={errors.password ? 'password-error' : undefined}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+            <PasswordToggle
+              type="button"
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              aria-pressed={showPassword}
+              onClick={() => setShowPassword((current) => !current)}
+            >
+              {showPassword ? (
+                <EyeOff size={19} aria-hidden="true" />
+              ) : (
+                <Eye size={19} aria-hidden="true" />
+              )}
+            </PasswordToggle>
+          </PasswordInputWrapper>
           {errors.password && (
             <ErrorMessage id="password-error">{errors.password}</ErrorMessage>
           )}
