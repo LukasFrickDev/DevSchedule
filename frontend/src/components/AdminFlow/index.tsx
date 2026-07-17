@@ -3,41 +3,70 @@ import { useCallback, useState } from 'react'
 import { adminApi } from '../../api/admin/adminApi'
 import { AdminDashboard } from './AdminDashboard'
 import { AdminLogin } from './AdminLogin'
-import { AdminBadge, Brand, ClientLink, Header, Main, Shell } from './styles'
+import {
+  AdminBadge,
+  Brand,
+  BrandLogo,
+  ClientLink,
+  Header,
+  HeaderActions,
+  LogoutButton,
+  Main,
+  Shell,
+} from './styles'
 
-const adminTokenKey = 'devschedule_admin_token'
+const adminAccessKey = 'devschedule_admin_access'
+const adminRefreshKey = 'devschedule_admin_refresh'
 
 export function AdminFlow() {
-  const [token, setToken] = useState<string | null>(() =>
-    window.sessionStorage.getItem(adminTokenKey),
+  const [access, setAccess] = useState<string | null>(() =>
+    window.sessionStorage.getItem(adminAccessKey),
   )
 
   const clearAuthentication = useCallback(() => {
-    window.sessionStorage.removeItem(adminTokenKey)
-    setToken(null)
+    window.sessionStorage.removeItem(adminAccessKey)
+    window.sessionStorage.removeItem(adminRefreshKey)
+    setAccess(null)
   }, [])
 
-  const authenticate = useCallback(async (username: string, password: string) => {
-    try {
-      const nextToken = await adminApi.login(username, password)
-      window.sessionStorage.setItem(adminTokenKey, nextToken)
-      setToken(nextToken)
-      return true
-    } catch {
-      return false
-    }
-  }, [])
+  const authenticate = useCallback(
+    async (username: string, password: string) => {
+      try {
+        const tokens = await adminApi.login(username, password)
+        window.sessionStorage.setItem(adminAccessKey, tokens.access)
+        window.sessionStorage.setItem(adminRefreshKey, tokens.refresh)
+        setAccess(tokens.access)
+        return true
+      } catch {
+        return false
+      }
+    },
+    [],
+  )
 
   return (
     <Main>
       <Shell>
         <Header>
-          <Brand>DevSchedule</Brand>
+          <Brand>
+            <BrandLogo src="/logo-devschedule-png.png" alt="" />
+            DevSchedule
+          </Brand>
           <AdminBadge>Administração</AdminBadge>
-          <ClientLink to="/">Área do cliente</ClientLink>
+          <HeaderActions>
+            {access && (
+              <LogoutButton type="button" onClick={clearAuthentication}>
+                Sair
+              </LogoutButton>
+            )}
+            <ClientLink to="/">Área do cliente</ClientLink>
+          </HeaderActions>
         </Header>
-        {token ? (
-          <AdminDashboard token={token} onAuthenticationFailed={clearAuthentication} />
+        {access ? (
+          <AdminDashboard
+            token={access}
+            onAuthenticationFailed={clearAuthentication}
+          />
         ) : (
           <AdminLogin onSubmit={authenticate} />
         )}

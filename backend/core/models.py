@@ -42,9 +42,9 @@ class Appointment(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["service", "date", "start"],
+                fields=["date", "start"],
                 condition=~models.Q(status="CANCELLED"),
-                name="unique_active_appointment_slot",
+                name="unique_active_global_appointment_slot",
             )
         ]
 

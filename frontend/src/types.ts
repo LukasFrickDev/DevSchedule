@@ -87,7 +87,16 @@ export type AdminAppointmentsResponse = {
   count: number
   next: string | null
   previous: string | null
+  summary: AdminAppointmentsSummary
   results: Appointment[]
+}
+
+export type AdminAppointmentsSummary = {
+  total: number
+  scheduled: number
+  confirmed: number
+  completed: number
+  cancelled: number
 }
 
 export type UpdateAppointmentStatusPayload = {

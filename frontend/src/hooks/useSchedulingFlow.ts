@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { isApiError, schedulingApi } from '../api/client-scheduling/schedulingApi'
+import {
+  isApiError,
+  schedulingApi,
+} from '../api/client-scheduling/schedulingApi'
 import type {
   ApiTime,
   Appointment,
@@ -42,6 +45,11 @@ export function matchesAvailabilityConflict(
 
 function readableError(error: unknown, fallback: string) {
   return isApiError(error) ? error.error.message : fallback
+}
+
+function isValidFullName(value: string) {
+  const parts = value.trim().split(/\s+/)
+  return parts.length >= 2 && parts.every((part) => part.length >= 2)
 }
 
 export function useSchedulingFlow() {
@@ -180,8 +188,8 @@ export function useSchedulingFlow() {
 
   function continueFromDetails() {
     const errors: { name?: string; phone?: string } = {}
-    if (name.trim().length < 2) {
-      errors.name = 'Informe seu nome com pelo menos 2 caracteres.'
+    if (!isValidFullName(name)) {
+      errors.name = 'Informe seu nome completo, com nome e sobrenome.'
     }
     const phoneDigits = phone.replace(/\D/g, '')
     if (phoneDigits.length !== 10 && phoneDigits.length !== 11) {
@@ -203,15 +211,13 @@ export function useSchedulingFlow() {
     submittingRef.current = true
     setSubmitting(true)
     try {
-      const created = await schedulingApi.createAppointment(
-        {
-          service_id: selectedService.id,
-          date: apiDate,
-          time: selectedTime,
-          customer_name: name.trim(),
-          customer_phone: phone.replace(/\D/g, ''),
-        },
-      )
+      const created = await schedulingApi.createAppointment({
+        service_id: selectedService.id,
+        date: apiDate,
+        time: selectedTime,
+        customer_name: name.trim(),
+        customer_phone: phone.replace(/\D/g, ''),
+      })
       setAppointment(created)
       setStep('success')
     } catch (error: unknown) {
@@ -281,7 +287,7 @@ export function useSchedulingFlow() {
           slot.start,
         ),
       ),
-    setName,
+    setName: (value: string) => setName(value.replace(/[^\p{L}\s]/gu, '')),
     setPhone: (value: string) => setPhone(normalizeAndFormatPhone(value)),
     continueFromSchedule,
     continueFromDetails,

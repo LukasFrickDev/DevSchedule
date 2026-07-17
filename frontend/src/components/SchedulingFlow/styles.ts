@@ -3,6 +3,7 @@ import styled, { css, keyframes } from 'styled-components'
 export const Main = styled.main`
   min-height: 100vh;
   padding: clamp(1rem, 3vw, 2.5rem);
+  overflow-x: clip;
 `
 
 export const Shell = styled.div`
@@ -16,6 +17,12 @@ export const Header = styled.header`
   justify-content: space-between;
   gap: ${({ theme }) => theme.spacing.md};
   margin-bottom: clamp(1.75rem, 5vw, 3.5rem);
+
+  @media (max-width: 30rem) {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: ${({ theme }) => theme.spacing.xl};
+  }
 `
 
 export const Brand = styled.span`
@@ -25,15 +32,13 @@ export const Brand = styled.span`
   font-size: 1.05rem;
   font-weight: 900;
   letter-spacing: -0.02em;
+`
 
-  &::before {
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: 50%;
-    background: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 1.25rem rgb(57 211 83 / 65%);
-    content: '';
-  }
+export const BrandLogo = styled.img`
+  width: clamp(1.5rem, 3vw, 2rem);
+  height: clamp(1.5rem, 3vw, 2rem);
+  flex: 0 0 auto;
+  object-fit: contain;
 `
 
 export const SecureNote = styled.span`
