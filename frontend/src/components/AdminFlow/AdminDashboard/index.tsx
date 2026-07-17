@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { useAdminAppointments } from '../../../hooks/useAdminAppointments'
-import type { AdminFixtureScenario, Appointment } from '../../../types'
+import type { Appointment } from '../../../types'
 import {
   formatApiDate,
   inputDateToApiDate,
@@ -24,7 +24,8 @@ import {
 } from './styles'
 
 type AdminDashboardProps = {
-  scenario: AdminFixtureScenario
+  token: string
+  onAuthenticationFailed: () => void
 }
 
 type DialogState = {
@@ -32,8 +33,8 @@ type DialogState = {
   appointment: Appointment
 } | null
 
-export function AdminDashboard({ scenario }: AdminDashboardProps) {
-  const admin = useAdminAppointments(scenario)
+export function AdminDashboard({ token, onAuthenticationFailed }: AdminDashboardProps) {
+  const admin = useAdminAppointments(token, onAuthenticationFailed)
   const [dialog, setDialog] = useState<DialogState>(null)
   const today = inputDateToApiDate(todayAsInputDate())
   const selectedApiDate = admin.selectedDate
@@ -53,7 +54,7 @@ export function AdminDashboard({ scenario }: AdminDashboardProps) {
 
     const success =
       dialog.kind === 'cancel'
-        ? await admin.updateStatus(dialog.appointment.id, 'CANCELLED')
+        ? await admin.cancelAppointment(dialog.appointment.id)
         : await admin.deleteAppointment(dialog.appointment.id)
     if (success) setDialog(null)
   }
