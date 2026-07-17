@@ -20,9 +20,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "unsafe-development-key")
 DEBUG = env_bool("DJANGO_DEBUG", default=True)
 DEVELOPMENT_FRONTEND_ORIGIN = "http://localhost:5173"
 
-ALLOWED_HOSTS = env_list(
-    "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1" if DEBUG else ""
-)
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1" if DEBUG else "")
 CSRF_TRUSTED_ORIGINS = env_list(
     "CSRF_TRUSTED_ORIGINS", DEVELOPMENT_FRONTEND_ORIGIN if DEBUG else ""
 )
