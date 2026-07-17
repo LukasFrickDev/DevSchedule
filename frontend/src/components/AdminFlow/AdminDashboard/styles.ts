@@ -135,7 +135,7 @@ export const ListHeader = styled.header`
     font-size: 0.85rem;
   }
 
-  @media (max-width: 52rem) {
+  @media (max-width: 68rem) {
     align-items: stretch;
     flex-direction: column;
     gap: ${({ theme }) => theme.spacing.md};
@@ -143,8 +143,9 @@ export const ListHeader = styled.header`
 `
 
 export const FilterBar = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+  width: min(100%, 52rem);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(10rem, 1fr)) max-content;
   gap: ${({ theme }) => theme.spacing.md};
   align-items: end;
 
@@ -153,8 +154,18 @@ export const FilterBar = styled.div`
     outline-offset: 2px;
   }
 
-  @media (max-width: 30rem) {
+  @media (max-width: 48rem) {
     width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    > button {
+      grid-column: 1 / -1;
+      justify-self: end;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    grid-template-columns: 1fr;
 
     button {
       width: 100%;
@@ -163,8 +174,7 @@ export const FilterBar = styled.div`
 `
 
 export const FilterField = styled.div`
-  flex: 1 1 11rem;
-  min-width: min(100%, 11rem);
+  min-width: 0;
 
   label {
     display: block;
@@ -183,10 +193,6 @@ export const FilterField = styled.div`
     background: ${({ theme }) => theme.colors.surfaceRaised};
     color: ${({ theme }) => theme.colors.text};
   }
-
-  @media (max-width: 30rem) {
-    flex-basis: 100%;
-  }
 `
 
 export const ClearButton = styled.button`
@@ -197,6 +203,7 @@ export const ClearButton = styled.button`
   background: transparent;
   color: ${({ theme }) => theme.colors.text};
   font-weight: 800;
+  white-space: nowrap;
   cursor: pointer;
 
   &:disabled {
