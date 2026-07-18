@@ -40,7 +40,7 @@ O sistema possui duas áreas:
 
 ## Regras de negócio
 
-- Os serviços funcionam de segunda a sexta-feira, das `09:00` às `17:00`.
+- Os atendimentos funcionam de segunda a sexta-feira, das `09:00` às `18:00`, com horários de início disponíveis entre `09:00` e `17:00`.
 - Todos os serviços possuem duração de 60 minutos.
 - A agenda é global e compartilhada: um horário ocupado fica indisponível para todos os serviços.
 - Agendamentos `SCHEDULED`, `CONFIRMED` e `COMPLETED` ocupam o horário; `CANCELLED` o libera.
@@ -113,6 +113,8 @@ cd DevSchedule
 
 ### 2. Iniciar o PostgreSQL
 
+Na raiz do projeto, execute:
+
 ```bash
 docker compose up -d db
 ```
@@ -120,39 +122,37 @@ docker compose up -d db
 Caso a porta `5432` esteja ocupada:
 
 ```bash
-POSTGRES_HOST_PORT=15432 docker compose up -d db
-```
-
-No Windows PowerShell:
-
-```powershell
-$env:POSTGRES_HOST_PORT=15432
+set POSTGRES_HOST_PORT=15432
 docker compose up -d db
 ```
 
 ### 3. Configurar o backend
 
+No terminal integrado do VS Code:
+
 ```bash
 cd backend
-python -m venv .venv
-```
-
-Ative o ambiente virtual antes de instalar as dependências:
-
-```powershell
-.venv\Scripts\activate
-```
-
-Instalar as dependências e copiar o arquivo de ambiente:
-
-```bash
+py -m venv .venv
+.\.venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env
+copy .env.example .env
 ```
 
-No Windows, copie manualmente `backend/.env.example` para `backend/.env` e ajuste os valores locais.
+No arquivo `backend/.env`, use o valor abaixo para o Docker Compose local padrão:
+
+```env
+POSTGRES_PASSWORD=devschedule
+```
+
+Caso tenha utilizado a porta `15432`, ajuste também:
+
+```env
+POSTGRES_PORT=15432
+```
 
 ### 4. Executar migrations e seed
+
+Ainda na pasta `backend`:
 
 ```bash
 python manage.py migrate
@@ -169,7 +169,13 @@ O backend estará disponível em `http://127.0.0.1:8000`.
 
 ### 6. Configurar o frontend
 
-Criar `frontend/.env.local` com:
+Abra outro terminal integrado do VS Code, na raiz do projeto, entre na pasta do frontend:
+
+```bash
+cd frontend
+```
+
+Crie o arquivo `frontend/.env.local` com:
 
 ```env
 VITE_API_URL=http://localhost:8000/api/devschedule
@@ -177,8 +183,9 @@ VITE_API_URL=http://localhost:8000/api/devschedule
 
 ### 7. Instalar e iniciar o frontend
 
+Ainda na pasta `frontend`:
+
 ```bash
-cd frontend
 npm install
 npm run dev
 ```
