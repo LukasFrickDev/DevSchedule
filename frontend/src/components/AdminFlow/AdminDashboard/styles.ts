@@ -205,6 +205,16 @@ export const FilterField = styled.div`
     select {
       -webkit-appearance: none;
       appearance: none;
+      padding: 0 ${({ theme }) => theme.spacing.xl} 0
+        ${({ theme }) => theme.spacing.md};
+      background-image:
+        linear-gradient(45deg, transparent 50%, currentColor 50%),
+        linear-gradient(135deg, currentColor 50%, transparent 50%);
+      background-position:
+        calc(100% - 1.05rem) calc(50% - 0.15rem),
+        calc(100% - 0.8rem) calc(50% - 0.15rem);
+      background-repeat: no-repeat;
+      background-size: 0.38rem 0.38rem;
     }
   }
 `
@@ -238,6 +248,16 @@ export const ClearButton = styled.button`
   @media (hover: none) and (pointer: coarse) {
     -webkit-appearance: none;
     appearance: none;
+    padding: 0 ${({ theme }) => theme.spacing.xl} 0
+      ${({ theme }) => theme.spacing.sm};
+    background-image:
+      linear-gradient(45deg, transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position:
+      calc(100% - 1.05rem) calc(50% - 0.1rem),
+      calc(100% - 0.8rem) calc(50% - 0.1rem);
+    background-repeat: no-repeat;
+    background-size: 0.36rem 0.36rem;
   }
 `
 
@@ -260,6 +280,14 @@ export const PaginationControls = styled.div`
 
     label {
       width: 100%;
+    }
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    select,
+    button {
+      -webkit-appearance: none;
+      appearance: none;
     }
   }
 `
@@ -298,6 +326,10 @@ export const LoadMoreButton = styled.button`
   &:focus-visible {
     outline: 3px solid ${({ theme }) => theme.colors.secondary};
     outline-offset: 3px;
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    padding: 0 ${({ theme }) => theme.spacing.md};
   }
 `
 
