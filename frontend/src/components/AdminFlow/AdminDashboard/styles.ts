@@ -302,6 +302,19 @@ export const PageSizeSelect = styled.select`
   font-size: 0.78rem;
   font-weight: 800;
 
+  @media (max-width: 30rem) {
+    padding: 0 ${({ theme }) => theme.spacing.xl} 0
+      ${({ theme }) => theme.spacing.sm};
+    background-image:
+      linear-gradient(45deg, transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position:
+      calc(100% - 1.05rem) calc(50% - 0.1rem),
+      calc(100% - 0.8rem) calc(50% - 0.1rem);
+    background-repeat: no-repeat;
+    background-size: 0.36rem 0.36rem;
+  }
+
   @media (hover: none) and (pointer: coarse) {
     -webkit-appearance: none;
     appearance: none;

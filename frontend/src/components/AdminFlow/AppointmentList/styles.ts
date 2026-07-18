@@ -229,6 +229,23 @@ export const StatusEditor = styled.div`
       font-size: 0.75rem;
     }
   }
+
+  @media (hover: none) and (pointer: coarse) {
+    select {
+      -webkit-appearance: none;
+      appearance: none;
+      padding: 0 ${({ theme }) => theme.spacing.xl} 0
+        ${({ theme }) => theme.spacing.xs};
+      background-image:
+        linear-gradient(45deg, transparent 50%, currentColor 50%),
+        linear-gradient(135deg, currentColor 50%, transparent 50%);
+      background-position:
+        calc(100% - 0.9rem) calc(50% - 0.15rem),
+        calc(100% - 0.65rem) calc(50% - 0.15rem);
+      background-repeat: no-repeat;
+      background-size: 0.32rem 0.32rem;
+    }
+  }
 `
 
 export const HiddenLabel = styled.label`
