@@ -133,24 +133,21 @@ docker compose up -d db
 ### 3. Configurar o backend
 
 ```bash
-python -m venv backend/.venv
+cd backend
+python -m venv .venv
 ```
 
 Ative o ambiente virtual antes de instalar as dependências:
 
 ```powershell
-.\backend\.venv\Scripts\Activate.ps1
-```
-
-```bash
-source backend/.venv/bin/activate
+.venv\Scripts\activate
 ```
 
 Instalar as dependências e copiar o arquivo de ambiente:
 
 ```bash
-pip install -r backend/requirements.txt
-cp backend/.env.example backend/.env
+pip install -r requirements.txt
+cp .env.example .env
 ```
 
 No Windows, copie manualmente `backend/.env.example` para `backend/.env` e ajuste os valores locais.
@@ -158,14 +155,14 @@ No Windows, copie manualmente `backend/.env.example` para `backend/.env` e ajust
 ### 4. Executar migrations e seed
 
 ```bash
-python backend/manage.py migrate
-python backend/manage.py seed_initial_services
+python manage.py migrate
+python manage.py seed_initial_services
 ```
 
 ### 5. Iniciar o backend
 
 ```bash
-python backend/manage.py runserver
+python manage.py runserver
 ```
 
 O backend estará disponível em `http://127.0.0.1:8000`.
@@ -345,8 +342,8 @@ A Inteligência Artificial foi utilizada como ferramenta de apoio. Todas as alte
 ## Limitações conhecidas
 
 - As credenciais administrativas são demonstrativas.
-- O Render utiliza plano gratuito, sujeito a suspensão por inatividade.
-- O PostgreSQL gratuito do Render possui limitações de retenção e disponibilidade.
+- O Web Service gratuito do Render pode ser suspenso após 15 minutos de inatividade. No primeiro acesso aguarde alguns segundos para ativar após inatividade.
+- O PostgreSQL gratuito do Render expira após 30 dias.
 - Não há notificações por e-mail, SMS ou WhatsApp.
 - Não há cadastro de conta para clientes.
 - Não há integração com Google Calendar ou pagamentos.
