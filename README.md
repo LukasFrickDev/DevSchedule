@@ -9,7 +9,8 @@ O sistema possui duas áreas:
 
 ## Demonstração
 
-- Frontend: https://projetolukasfrick-devschedule.vercel.app/
+- Área do cliente: https://projetolukasfrick-devschedule.vercel.app/
+- Área administrativa: https://projetolukasfrick-devschedule.vercel.app/admin
 - Backend: https://devschedule-api.onrender.com/
 - Health check: https://devschedule-api.onrender.com/api/devschedule/health/
 - Repositório: https://github.com/LukasFrickDev/DevSchedule
@@ -357,7 +358,8 @@ A Inteligência Artificial foi utilizada como ferramenta de apoio. Todas as alte
 
 ## Links
 
-- Aplicação: https://projetolukasfrick-devschedule.vercel.app/
+- Área do cliente: https://projetolukasfrick-devschedule.vercel.app/
+- Área administrativa: https://projetolukasfrick-devschedule.vercel.app/admin
 - API: https://devschedule-api.onrender.com/
 - Health check: https://devschedule-api.onrender.com/api/devschedule/health/
 - Repositório: https://github.com/LukasFrickDev/DevSchedule
